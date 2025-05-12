@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="model.ProductTest" time="0.022" tests="14" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="model.ProductTest" time="0.034" tests="14" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="24"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.class.path" value="C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\test-classes;C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\classes;C:\Users\Abrar Yusuf\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\Abrar Yusuf\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;"/>
+    <property name="java.class.path" value="C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\test-classes;C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\classes;C:\Users\Abrar Yusuf\.m2\repository\com\mysql\mysql-connector-j\8.0.33\mysql-connector-j-8.0.33.jar;C:\Users\Abrar Yusuf\.m2\repository\javax\servlet\javax.servlet-api\4.0.1\javax.servlet-api-4.0.1.jar;C:\Users\Abrar Yusuf\.m2\repository\javax\servlet\jstl\1.2\jstl-1.2.jar;C:\Users\Abrar Yusuf\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\Abrar Yusuf\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\Abrar Yusuf\.m2\repository\com\google\protobuf\protobuf-java\3.9.1\protobuf-java-3.9.1.jar;"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
@@ -15,9 +15,9 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="AU"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-24\bin"/>
-    <property name="sun.java.command" value="C:\Users\ABRARY~1\AppData\Local\Temp\surefire3948405625164680878\surefirebooter8404879621766451234.jar C:\Users\Abrar Yusuf\AppData\Local\Temp\surefire3948405625164680878 2025-05-12T21-40-52_088-jvmRun1 surefire4852654942095515876tmp surefire_06417096064646801924tmp"/>
+    <property name="sun.java.command" value="C:\Users\ABRARY~1\AppData\Local\Temp\surefire2408439646333056309\surefirebooter8112754843390348683.jar C:\Users\Abrar Yusuf\AppData\Local\Temp\surefire2408439646333056309 2025-05-13T02-11-04_475-jvmRun1 surefire16281423528245788604tmp surefire_013487942681254869766tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\test-classes;C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\classes;C:\Users\Abrar Yusuf\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\Abrar Yusuf\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;"/>
+    <property name="surefire.test.class.path" value="C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\test-classes;C:\Users\Abrar Yusuf\OneDrive\Desktop\IoTBay\iotbay\target\classes;C:\Users\Abrar Yusuf\.m2\repository\com\mysql\mysql-connector-j\8.0.33\mysql-connector-j-8.0.33.jar;C:\Users\Abrar Yusuf\.m2\repository\javax\servlet\javax.servlet-api\4.0.1\javax.servlet-api-4.0.1.jar;C:\Users\Abrar Yusuf\.m2\repository\javax\servlet\jstl\1.2\jstl-1.2.jar;C:\Users\Abrar Yusuf\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\Abrar Yusuf\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\Abrar Yusuf\.m2\repository\com\google\protobuf\protobuf-java\3.9.1\protobuf-java-3.9.1.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\Abrar Yusuf"/>
     <property name="user.language" value="en"/>
@@ -30,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\ABRARY~1\AppData\Local\Temp\surefire3948405625164680878\surefirebooter8404879621766451234.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\ABRARY~1\AppData\Local\Temp\surefire2408439646333056309\surefirebooter8112754843390348683.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="24.0.1+9-30"/>
@@ -58,7 +58,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="68.0"/>
   </properties>
-  <testcase name="testGetPrice" classname="model.ProductTest" time="0.001"/>
+  <testcase name="testGetPrice" classname="model.ProductTest" time="0.003"/>
   <testcase name="testSetFavourited" classname="model.ProductTest" time="0"/>
   <testcase name="testSetDescription" classname="model.ProductTest" time="0"/>
   <testcase name="testIsFavourited" classname="model.ProductTest" time="0"/>
@@ -66,10 +66,10 @@
   <testcase name="testGetProductID" classname="model.ProductTest" time="0"/>
   <testcase name="testSetQuantity" classname="model.ProductTest" time="0"/>
   <testcase name="testGetQuantity" classname="model.ProductTest" time="0"/>
-  <testcase name="testSetImageUrl" classname="model.ProductTest" time="0.001"/>
+  <testcase name="testSetImageUrl" classname="model.ProductTest" time="0"/>
   <testcase name="testGetImageUrl" classname="model.ProductTest" time="0"/>
   <testcase name="testGetDescription" classname="model.ProductTest" time="0"/>
   <testcase name="testSetProductID" classname="model.ProductTest" time="0"/>
-  <testcase name="testSetName" classname="model.ProductTest" time="0"/>
+  <testcase name="testSetName" classname="model.ProductTest" time="0.001"/>
   <testcase name="testSetPrice" classname="model.ProductTest" time="0"/>
 </testsuite>

@@ -1,2 +1,10 @@
+controller\CreateOrderServlet.class
+controller\DBConnector.class
 model\Product.class
 model\User.class
+model\Order.class
+controller\ProductDAO.class
+controller\ViewOrderDetailsServlet.class
+model\OrderLine.class
+controller\OrderDAO.class
+controller\UpdateOrderServlet.class

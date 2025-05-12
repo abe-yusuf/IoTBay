@@ -20,19 +20,53 @@
   </properties>
 
   <dependencies>
+    <!-- MySQL JDBC Driver -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.33</version>
+    </dependency>
+    
+    <!-- Java EE / Jakarta EE API -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- JSTL for JSP -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
+    </dependency>
+    
+    <!-- JUnit for testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
+    
+    <!-- Google Protobuf (keeping your existing dependency) -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.9.1</version>
+    </dependency>
   </dependencies>
+    
 
 <build>
   <finalName>iotbay</finalName>
   <resources>
     <resource>
       <directory>src/main/java</directory>
+    </resource>
+    <resource>
+      <directory>src/main/resources</directory>
     </resource>
   </resources>
   <plugins>
