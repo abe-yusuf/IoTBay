@@ -1,0 +1,4 @@
+controller\TestDBConnector.class
+model\OrderTest.class
+model\OrderLineTest.class
+model\ProductTest.class
