@@ -1,0 +1,7 @@
+dao/DBConnector.class
+dao/ProductDAO.class
+model/Product.class
+controller/ProductServlet.class
+util/DatabaseUtil.class
+model/User.class
+controller/InitServlet.class
