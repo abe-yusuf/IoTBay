@@ -1,18 +1,20 @@
 package controller;
 
-import model.Order;
-import model.OrderLine;
-import model.Product;
-import model.User;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import model.Order;
+import model.OrderLine;
+import model.Product;
+import model.User;
 
 @WebServlet(name = "CreateOrderServlet", urlPatterns = {"/createOrder"})
 public class CreateOrderServlet extends HttpServlet {
@@ -66,7 +68,7 @@ public class CreateOrderServlet extends HttpServlet {
                     // For anonymous users, use a placeholder user ID
                     currentOrder = new Order(0);
                 } else {
-                    currentOrder = new Order(user.getUserID());  // Changed from getCustomerID to getUserID
+                    currentOrder = new Order(user.getUserID());
                 }
                 session.setAttribute("currentOrder", currentOrder);
             }
@@ -99,25 +101,72 @@ public class CreateOrderServlet extends HttpServlet {
                     return;
                 }
                 
-                // Create a new order line
-                OrderLine newLine = new OrderLine(
-                    productID,
-                    quantity,
-                    product.getPrice(),
-                    product.getName()
-                );
+                // Check if product already exists in the cart
+                boolean productExists = false;
+                for (OrderLine existingLine : currentOrder.getOrderLines()) {
+                    if (existingLine.getProductID() == productID) {
+                        // Update existing order line quantity
+                        int newQuantity = existingLine.getQuantity() + quantity;
+                        if (!productDAO.checkStock(productID, newQuantity)) {
+                            request.setAttribute("errorMessage", "Not enough stock available. You already have " + 
+                                existingLine.getQuantity() + " of this item in your cart.");
+                            doGet(request, response);
+                            return;
+                        }
+                        existingLine.setQuantity(newQuantity);
+                        existingLine.setSubtotal(existingLine.getQuantity() * existingLine.getProductPrice());
+                        productExists = true;
+                        break;
+                    }
+                }
                 
-                // Add to current order
-                currentOrder.addOrderLine(newLine);
+                if (!productExists) {
+                    // Create a new order line
+                    OrderLine newLine = new OrderLine(
+                        productID,
+                        quantity,
+                        product.getPrice(),
+                        product.getName()
+                    );
+                    currentOrder.addOrderLine(newLine);
+                } else {
+                    // Recalculate total for existing product update
+                    currentOrder.calculateTotal();
+                }
+                
                 session.setAttribute("currentOrder", currentOrder);
-                request.setAttribute("successMessage", product.getName() + " added to your order.");
+                request.setAttribute("successMessage", product.getName() + " added to your cart.");
+                
+            } else if ("removeProduct".equals(action)) {
+                // Remove product from cart
+                String productIDParam = request.getParameter("productID");
+                if (productIDParam != null) {
+                    int productID = Integer.parseInt(productIDParam);
+                    currentOrder.getOrderLines().removeIf(line -> line.getProductID() == productID);
+                    currentOrder.calculateTotal();
+                    session.setAttribute("currentOrder", currentOrder);
+                    request.setAttribute("successMessage", "Product removed from your cart.");
+                }
                 
             } else if ("saveOrder".equals(action)) {
+                // Check if user is logged in
+                User user = (User) session.getAttribute("user");
+                if (user == null) {
+                    request.setAttribute("errorMessage", "You must be logged in to save an order.");
+                    request.getRequestDispatcher("/login.jsp").forward(request, response);
+                    return;
+                }
+                
                 // Save the order to database
                 if (currentOrder.getOrderLines().isEmpty()) {
                     request.setAttribute("errorMessage", "Cannot save an empty order.");
                     doGet(request, response);
                     return;
+                }
+                
+                // Update order with logged-in user ID if it was created anonymously
+                if (currentOrder.getUserID() == 0) {
+                    currentOrder.setUserID(user.getUserID());
                 }
                 
                 conn.setAutoCommit(false);
@@ -139,7 +188,6 @@ public class CreateOrderServlet extends HttpServlet {
                     session.removeAttribute("currentOrder");
                     
                     // Redirect to order details
-                    request.setAttribute("successMessage", "Order created successfully!");
                     response.sendRedirect(request.getContextPath() + "/viewOrderDetails?orderID=" + orderID);
                     return;
                     

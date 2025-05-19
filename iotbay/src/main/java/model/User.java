@@ -73,4 +73,10 @@ public class User implements Serializable {
     public String getFullName() {
         return fname + " " + lname;
     }
+    
+
+    public boolean isAdmin() {
+        return false; 
+    }
+    
 }
