@@ -1,11 +1,9 @@
 package controller;
 
-import model.Order;
-import model.OrderLine;
-import model.User;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import model.Order;
+import model.OrderLine;
+import model.User;
 
 @WebServlet(name = "CancelOrderServlet", urlPatterns = {"/cancelOrder"})
 public class CancelOrderServlet extends HttpServlet {
@@ -24,7 +25,6 @@ public class CancelOrderServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         
-        // Check if user is logged in
         if (user == null) {
             request.setAttribute("errorMessage", "You must be logged in to cancel orders.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
@@ -45,7 +45,6 @@ public class CancelOrderServlet extends HttpServlet {
             OrderDAO orderDAO = new OrderDAO(conn);
             ProductDAO productDAO = new ProductDAO(conn);
             
-            // Get the order
             Order order = orderDAO.getOrderById(orderID);
             
             if (order == null) {
@@ -54,14 +53,12 @@ public class CancelOrderServlet extends HttpServlet {
                 return;
             }
             
-            // Check if this order belongs to the logged-in user
-            if (order.getUserID() != user.getUserID()) {  // Changed from getCustomerID to getUserID
+            if (order.getUserID() != user.getUserID()) {  
                 request.setAttribute("errorMessage", "You do not have permission to cancel this order.");
                 response.sendRedirect(request.getContextPath() + "/viewOrders");
                 return;
             }
             
-            // Check if the order is in a state that can be cancelled
             if (!"Saved".equals(order.getStatus())) {
                 request.setAttribute("errorMessage", "Only saved orders can be cancelled.");
                 response.sendRedirect(request.getContextPath() + "/viewOrderDetails?orderID=" + orderID);
@@ -70,13 +67,14 @@ public class CancelOrderServlet extends HttpServlet {
             
             conn.setAutoCommit(false);
             try {
-                // Update order status to Cancelled
                 orderDAO.cancelOrder(orderID);
-                
-                // Restore product stock for all order lines
+
                 for (OrderLine line : order.getOrderLines()) {
                     productDAO.increaseStock(line.getProductID(), line.getQuantity());
                 }
+
+                // Access Log
+                AccessLogServlet.logAction(request, "Cancelled order #" + orderID);
                 
                 conn.commit();
                 request.setAttribute("successMessage", "Order cancelled successfully!");

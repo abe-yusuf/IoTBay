@@ -39,8 +39,11 @@ public class ViewOrdersServlet extends HttpServlet {
             // Get all orders for the logged-in user
             List<Order> orders = orderDAO.getOrdersByUserId(user.getUserID());
             request.setAttribute("orders", orders);
-            
-            // Check for success/error messages from session
+
+            //Access Log
+            AccessLogServlet.logAction(request, "Viewed order history");
+
+            // Handle any messages stored in session (success/error)
             String successMessage = (String) session.getAttribute("successMessage");
             String errorMessage = (String) session.getAttribute("errorMessage");
             
