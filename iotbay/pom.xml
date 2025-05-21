@@ -9,7 +9,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
-  <name>iotbay Maven Webapp</name>
+  <name>IoTBay Maven Webapp</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -17,6 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <derby.version>10.15.2.0</derby.version>
   </properties>
 
   <dependencies>
@@ -26,13 +27,53 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- Jakarta JSTL Dependencies -->
+    <dependency>
+        <groupId>jakarta.servlet.jsp.jstl</groupId>
+        <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+        <version>3.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.web</groupId>
+        <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+        <version>3.0.1</version>
+    </dependency>
+    
+    <!-- Derby Dependencies -->
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>${derby.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyclient</artifactId>
+      <version>${derby.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbytools</artifactId>
+      <version>${derby.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyshared</artifactId>
+      <version>${derby.version}</version>
+    </dependency>
   </dependencies>
 
 <build>
   <finalName>iotbay</finalName>
   <resources>
     <resource>
-      <directory>src/main/java</directory>
+      <directory>src/main/resources</directory>
     </resource>
   </resources>
   <plugins>
@@ -56,7 +97,24 @@
       <artifactId>maven-war-plugin</artifactId>
       <version>3.2.2</version>
       <configuration>
-        <failOnMissingWebXml>false</failOnMissingWebXml> <!-- optional if you're using annotations -->
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <warSourceDirectory>src/main/webapp</warSourceDirectory>
+        <webResources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <targetPath>WEB-INF/classes</targetPath>
+          </resource>
+        </webResources>
+        <packagingIncludes>
+          WEB-INF/lib/*.jar,
+          WEB-INF/classes/**/*,
+          WEB-INF/views/**/*,
+          resources/**/*,
+          META-INF/**/*,
+          **/*.jsp,
+          **/*.css,
+          **/*.js
+        </packagingIncludes>
       </configuration>
     </plugin>
     <plugin>
