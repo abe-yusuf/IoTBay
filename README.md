@@ -1,74 +1,305 @@
-# IoTBay Project
+# IoTBay E-Commerce Platform
 
-![Screenshot](/src/main/resources/images/register.png)
+## Project Overview
+IoTBay is a comprehensive e-commerce platform specialized in IoT (Internet of Things) devices and related products. The application is built using Java EE technologies and follows a Model-View-Controller (MVC) architecture pattern.
 
-## Overview
+## Individual Contributions
+### Team Member Responsibilities
+- **User Access Management**: [Team Member Name]
+  - Implementation of user authentication
+  - User profile management
+  - Access control and authorization
+  
+- **IoT Device Catalogue**: [Team Member Name]
+  - Product catalog implementation
+  - Device management interface
+  - Search and filter functionality
+  
+- **Order Management**: [Team Member Name]
+  - Shopping cart functionality
+  - Order processing system
+  - Order history tracking
 
-### Project Description
+## Technology Stack
+- **Backend**: Java EE (Jakarta EE)
+- **Database**: Apache Derby
+- **Web Server**: Apache Tomcat
+- **Frontend**: JSP (JavaServer Pages), JSTL, HTML, CSS
+- **Build Tool**: Maven
 
-A Java Web App, created for 41025 Introduction to Software Development.
+## Project Structure
+```
+iotbay/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   ├── controller/    # Servlet controllers
+│       │   ├── dao/          # Data Access Objects
+│       │   ├── model/        # Domain models
+│       │   └── util/         # Utility classes
+│       ├── resources/        # Configuration files
+│       └── webapp/
+│           ├── WEB-INF/
+│           │   └── views/    # JSP view files
+│           ├── css/          # Stylesheets
+│           └── images/       # Image assets
+├── pom.xml                   # Maven configuration
+└── README.md                # Project documentation
+```
 
+## Core Features
 
-### MVP
+### User Management
+- **User Registration**: New users can create accounts with personal details
+- **Authentication**: Secure login system with session management
+- **Profile Management**: Users can view and update their profile information
+- **Account Deactivation**: Administrators can deactivate user accounts
+- **User Search**: Advanced search functionality for user management
 
-- R0 Implementation - Login/Register/Logout
+### Product Management
+- **Product Catalog**: Browse and view available IoT devices
+- **Product Details**: Detailed product information and specifications
+- **Product Search**: Search products by various criteria
+- **Inventory Management**: Staff can manage product inventory
+- **Product Updates**: Staff can modify product details and pricing
 
+### Shopping Features
+- **Shopping Cart**: Add/remove products, update quantities
+- **Checkout Process**: Secure order placement
+- **Order History**: View past orders and their status
+- **Order Management**: Staff can process and manage orders
 
-| Page               |             Status |
-|--------------------|--------------------|
-| Landing Page       | Done               |
-| Login Page         | Done               |
-| Register Page      | Done               |
-| Welcome Page	     | Done               |
-| Main Page          |                    |
-| Logout Page        | Done               |
-| Data Model         | Started            |
+### Administrative Features
+- **User Administration**: Manage user accounts and permissions
+- **Staff Management**: Assign and manage staff roles
+- **Order Processing**: Handle order fulfillment and tracking
+- **Inventory Control**: Monitor and update product stock levels
 
-<!--
->- **Landing page** – Implement the landing page or home
-page of the IoTBay application. It is the starting point of
-the web application and should provide the options of
-login and register for users.
->- **Login page** – Implement the login page using a web
-form (e.g. JSP). The login page must post the form-data
-to the welcome page.
->- **Register page** – Implement the register page using a
-web form (e.g. JSP). The register page must post the
-form-data to the welcome page.
->- **Welcome page** – Implement the welcome page to
-retrieve the posted form-data from the register page and
-the login page. The welcome page must use JavaBeans
-and sessions to transport the logged-in user data to the
-main page.
->- **Main page** – Implement the main page to retrieve the
-user Beans saved into the session and display it. The
-main page must provide a logout link.
->- **Logout page** – Implement the logout page for users to
-use from the main page. The logout page must redirect
-users to the landing page and terminate the session.
->- **Data model** – Create an initial version of the IoTBay
-software application data model (JavaBeans).
+## Key Components
 
--->
+### Data Access Objects (DAO)
+- **UserDAO**: Handles user-related database operations
+  - User creation and authentication
+  - Profile updates and management
+  - User search functionality
+  - Account status management
 
+- **ProductDAO**: Manages product-related operations
+  - Product listing and details
+  - Inventory management
+  - Product updates and deletion
 
-## Notes
-### Environment Setup
+- **OrderDAO**: Handles order processing
+  - Order creation and management
+  - Order history tracking
+  - Order status updates
 
-- Java Runtime - JavaSE-17
+### Controllers (Servlets)
+- **AdminServlet**: Handles administrative functions
+- **AuthServlet**: Manages user authentication
+- **ProductServlet**: Controls product-related operations
+- **OrderServlet**: Processes order-related requests
+- **CartServlet**: Manages shopping cart functionality
 
-- Compiler - 17
+### Models
+- **User**: Represents user data and attributes
+- **Product**: Contains product information
+- **Order**: Represents order details
+- **CartItem**: Shopping cart item representation
 
-- Tester - JUnit
+### Utilities
+- **DatabaseUtil**: Database connection management
+- **AuthenticationUtil**: Security and authentication helpers
+- **ValidationUtil**: Input validation utilities
 
-- Server - apace-tomcat-11.0.0-M6
+## Security Features
+- Password protection for user accounts
+- Role-based access control (RBAC)
+- Session management
+- Input validation and sanitization
+- Secure database operations
 
-#
-### Other
+## Database Schema
+The application uses Apache Derby with the following key tables:
+- `users`: User account information
+- `products`: Product catalog data
+- `orders`: Order information
+- `order_items`: Individual items in orders
+- `cart_items`: Shopping cart contents
 
-- Please create a seperate branch to work on and not in main to avoid conflicts
-- Once functionality is done, please commit and push to GitHub, create a pull request to ensure the main branch is up to date. 
+## Future Enhancements
+1. Implementation of password hashing for improved security
+2. Advanced product search filters
+4. Order tracking system
+5. Customer review and rating system
+6. Product recommendations
+7. Email notifications
+8. Analytics dashboard for administrators
 
-- To view the README in VS Code: **Right Click + Open Preview** or **Ctr + Shift + V**
-- Resources such as images can go into: **main -> resources**
-- When creating a new page, copy the template file and the content can go inside the `<main>` tags.
+## Development Guidelines
+- Follow MVC architecture pattern
+- Implement proper error handling and logging
+- Maintain separation of concerns
+- Use prepared statements for database operations
+- Follow Java coding conventions
+- Document all major components and functions
+
+## Testing
+- Integration tests for database operations
+- User interface testing
+- Security testing
+- Performance testing
+
+## Deployment
+1. Configure Apache Tomcat server
+2. Set up Apache Derby database
+3. Deploy WAR file to Tomcat
+4. Configure environment variables
+5. Verify database connectivity
+6. Test all functionality in production environment
+
+## Reporting Metrics
+- User registration and activity
+- Sales and revenue tracking
+- Product performance
+- Order processing times
+- System performance metrics
+- Error rates and types
+- User engagement metrics
+
+## MVC Implementation Details
+
+### View Components
+- **JSP Pages**:
+  - User registration and login forms
+  - Product catalog displays
+  - Shopping cart interface
+  - Order management screens
+  - Admin control panels
+- **Styling**: Responsive CSS with modern design principles
+- **Client-side Validation**: JavaScript form validation
+
+### Controller Components
+- **Servlet Implementation**:
+  - Request handling and routing
+  - Session management
+  - Form data processing
+  - Business logic coordination
+- **Authentication Flow**:
+  - Login/logout processing
+  - Session tracking
+  - Access control enforcement
+
+### Model Components
+- **Data Objects**:
+  - User entity management
+  - Product catalog representation
+  - Order processing logic
+- **Database Interactions**:
+  - CRUD operations
+  - Transaction management
+  - Data validation
+
+## User Stories and CRUD Mappings
+
+### User Access Management
+- **Create**: New user registration
+- **Read**: User profile viewing
+- **Update**: Profile information modification
+- **Delete**: Account deactivation
+
+### IoT Device Catalogue
+- **Create**: Add new products to catalog
+- **Read**: View product details
+- **Update**: Modify product information
+- **Delete**: Remove products from catalog
+
+### Order Management
+- **Create**: Place new orders
+- **Read**: View order history
+- **Update**: Modify order status
+- **Delete**: Cancel orders
+
+## Non-Functional Requirements
+
+### Security Implementation
+- **Authentication**:
+  - Secure password handling
+  - Session management
+  - Token-based authentication
+- **Authorization**:
+  - Role-based access control
+  - Permission management
+  - Resource protection
+- **Data Protection**:
+  - Input validation
+  - SQL injection prevention
+  - XSS protection
+
+### Performance Metrics
+- **Response Time**:
+  - Page load < 2 seconds
+  - Database queries < 1 second
+- **Concurrent Users**:
+  - Support for 100+ simultaneous users
+  - Efficient connection pooling
+- **Resource Usage**:
+  - Optimized memory utilization
+  - Efficient database queries
+  - Caching implementation
+
+## Testing Framework
+
+### Unit Testing
+- JUnit test cases for core functionality
+- Mock objects for isolated testing
+- Coverage reports
+
+### Integration Testing
+- End-to-end workflow testing
+- Component interaction verification
+- Database operation validation
+
+### User Acceptance Testing
+- Feature functionality verification
+- User interface testing
+- Cross-browser compatibility
+- Mobile responsiveness
+
+### Performance Testing
+- Load testing results
+- Stress testing outcomes
+- Scalability assessment
+
+## Defect Management
+### Known Issues and Resolutions
+- Issue tracking and categorization
+- Resolution status
+- Impact assessment
+- Mitigation strategies
+
+## Project Timeline
+### Development Phases
+1. Requirements Analysis
+2. Design Phase
+3. Implementation
+4. Testing
+5. Deployment
+6. Maintenance
+
+## Deployment Guide
+1. Configure Apache Tomcat server
+2. Set up Apache Derby database
+3. Deploy WAR file to Tomcat
+4. Configure environment variables
+5. Verify database connectivity
+6. Test all functionality in production environment
+
+## Monitoring and Metrics
+- User registration and activity tracking
+- Sales and revenue analytics
+- System performance monitoring
+- Error rate tracking
+- User engagement metrics
+
+This documentation provides a comprehensive overview of the IoTBay e-commerce platform, covering all aspects required for detailed project reporting and analysis.

@@ -113,10 +113,80 @@ public class ProductDAO {
     }
     
     public void deleteProduct(int productId) throws SQLException {
-        String query = "DELETE FROM PRODUCTS WHERE PRODUCT_ID = ?";
-        PreparedStatement stmt = conn.prepareStatement(query);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        // Set lock timeout to 60 seconds (default is 60000 milliseconds)
+        try {
+            conn.createStatement().execute("CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.locks.waitTimeout', '60')");
+        } catch (SQLException e) {
+            // Log the error but continue - not critical if this fails
+            System.err.println("Warning: Could not set lock timeout: " + e.getMessage());
+        }
+        
+        // Start transaction
+        boolean originalAutoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        
+        try {
+            // First check if product exists
+            stmt = conn.prepareStatement("SELECT COUNT(*) FROM products WHERE product_id = ?");
+            stmt.setInt(1, productId);
+            rs = stmt.executeQuery();
+            
+            if (rs.next() && rs.getInt(1) == 0) {
+                throw new SQLException("Product not found");
+            }
+            
+            // Check for references in cart items
+            stmt = conn.prepareStatement("SELECT COUNT(*) FROM cart_items WHERE product_id = ?");
+            stmt.setInt(1, productId);
+            rs = stmt.executeQuery();
+            
+            if (rs.next() && rs.getInt(1) > 0) {
+                throw new SQLException("Cannot delete: Product is in users' carts");
+            }
+            
+            // Check for references in order items
+            stmt = conn.prepareStatement("SELECT COUNT(*) FROM order_items WHERE product_id = ?");
+            stmt.setInt(1, productId);
+            rs = stmt.executeQuery();
+            
+            if (rs.next() && rs.getInt(1) > 0) {
+                throw new SQLException("Cannot delete: Product is referenced in orders");
+            }
+            
+            // If we get here, it's safe to delete
+            stmt = conn.prepareStatement("DELETE FROM products WHERE product_id = ?");
         stmt.setInt(1, productId);
         
-        stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Failed to delete product");
+            }
+            
+            // Commit the transaction
+            conn.commit();
+        } catch (SQLException e) {
+            // Rollback on error
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackEx) {
+                // Log rollback error
+                System.err.println("Error during rollback: " + rollbackEx.getMessage());
+            }
+            throw e;
+        } finally {
+            // Restore original auto-commit state
+            try {
+                conn.setAutoCommit(originalAutoCommit);
+            } catch (SQLException e) {
+                System.err.println("Error restoring auto-commit: " + e.getMessage());
+            }
+            
+            // Close resources
+            if (rs != null) try { rs.close(); } catch (SQLException e) { /* ignore */ }
+            if (stmt != null) try { stmt.close(); } catch (SQLException e) { /* ignore */ }
+        }
     }
 }
