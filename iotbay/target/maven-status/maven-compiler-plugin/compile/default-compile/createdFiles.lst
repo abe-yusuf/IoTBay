@@ -3,6 +3,7 @@ util/ValidationUtil.class
 model/Product.class
 controller/IndexServlet.class
 controller/AccessLogServlet.class
+controller/AdminAccessLogServlet.class
 model/AccessLog.class
 controller/ProductServlet.class
 model/Cart.class
@@ -23,3 +24,4 @@ controller/AdminServlet.class
 model/User.class
 controller/CartServlet.class
 controller/AccountServlet.class
+controller/LegalServlet.class

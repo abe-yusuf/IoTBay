@@ -1,5 +1,7 @@
 package model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +29,14 @@ public class Cart {
     }
     
     public double getTotalAmount() {
-        return items.stream()
+        double total = items.stream()
             .mapToDouble(item -> item.getPrice() * item.getQuantity())
             .sum();
+        
+        // Round up to 2 decimal places
+        BigDecimal bd = new BigDecimal(total);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
     
     public void clear() {

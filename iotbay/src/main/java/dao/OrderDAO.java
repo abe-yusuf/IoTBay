@@ -509,7 +509,7 @@ public class OrderDAO {
             params.add(java.sql.Date.valueOf(fromDate.trim()));
         }
         if (toDate != null && !toDate.trim().isEmpty()) {
-            sql.append("AND o.order_date < ? + 1 DAY ");
+            sql.append("AND o.order_date < {fn TIMESTAMPADD(SQL_TSI_DAY, 1, ?)} ");
             params.add(java.sql.Date.valueOf(toDate.trim()));
         }
         

@@ -8,6 +8,7 @@
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/dao/OrderDAO.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/model/Product.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/util/ValidationUtil.java
+/Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/controller/LegalServlet.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/controller/OrderServlet.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/model/Cart.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/dao/ProductDAO.java
@@ -21,5 +22,6 @@
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/controller/AuthServlet.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/model/OrderItem.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/util/DatabaseUtil.java
+/Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/controller/AdminAccessLogServlet.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/controller/AdminServlet.java
 /Users/malious/Documents/Study/IoTBay-1/iotbay/src/main/java/model/OrderStatus.java

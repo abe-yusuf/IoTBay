@@ -109,7 +109,7 @@ public class AccessLogDAO {
             params.add(java.sql.Date.valueOf(fromDate.trim()));
         }
         if (toDate != null && !toDate.trim().isEmpty()) {
-            sql.append("AND login_time < ? + 1 DAY ");
+            sql.append("AND login_time < {fn TIMESTAMPADD(SQL_TSI_DAY, 1, ?)} ");
             params.add(java.sql.Date.valueOf(toDate.trim()));
         }
         

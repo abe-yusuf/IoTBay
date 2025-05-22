@@ -49,17 +49,17 @@ public class ProductDAO {
             localConn = getConnection();
             stmt = localConn.createStatement();
             rs = stmt.executeQuery(query);
-            
-            while (rs.next()) {
-                Product product = new Product();
-                product.setProductID(rs.getInt("PRODUCT_ID"));
-                product.setName(rs.getString("NAME"));
-                product.setImageUrl(rs.getString("IMAGE_URL"));
-                product.setDescription(rs.getString("DESCRIPTION"));
-                product.setPrice(rs.getDouble("PRICE"));
-                product.setQuantity(rs.getInt("QUANTITY"));
-                product.setFavourited(rs.getBoolean("FAVOURITED"));
-                products.add(product);
+        
+        while (rs.next()) {
+            Product product = new Product();
+            product.setProductID(rs.getInt("PRODUCT_ID"));
+            product.setName(rs.getString("NAME"));
+            product.setImageUrl(rs.getString("IMAGE_URL"));
+            product.setDescription(rs.getString("DESCRIPTION"));
+            product.setPrice(rs.getDouble("PRICE"));
+            product.setQuantity(rs.getInt("QUANTITY"));
+            product.setFavourited(rs.getBoolean("FAVOURITED"));
+            products.add(product);
             }
         } finally {
             if (rs != null) rs.close();
@@ -100,21 +100,21 @@ public class ProductDAO {
         try {
             localConn = getConnection();
             stmt = localConn.prepareStatement(query);
-            stmt.setInt(1, productId);
+        stmt.setInt(1, productId);
             rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                Product product = new Product();
-                product.setProductID(rs.getInt("PRODUCT_ID"));
-                product.setName(rs.getString("NAME"));
-                product.setImageUrl(rs.getString("IMAGE_URL"));
-                product.setDescription(rs.getString("DESCRIPTION"));
-                product.setPrice(rs.getDouble("PRICE"));
-                product.setQuantity(rs.getInt("QUANTITY"));
-                product.setFavourited(rs.getBoolean("FAVOURITED"));
-                return product;
-            }
-            return null;
+        
+        if (rs.next()) {
+            Product product = new Product();
+            product.setProductID(rs.getInt("PRODUCT_ID"));
+            product.setName(rs.getString("NAME"));
+            product.setImageUrl(rs.getString("IMAGE_URL"));
+            product.setDescription(rs.getString("DESCRIPTION"));
+            product.setPrice(rs.getDouble("PRICE"));
+            product.setQuantity(rs.getInt("QUANTITY"));
+            product.setFavourited(rs.getBoolean("FAVOURITED"));
+            return product;
+        }
+        return null;
         } finally {
             if (rs != null) rs.close();
             if (stmt != null) stmt.close();
@@ -131,18 +131,18 @@ public class ProductDAO {
         try {
             localConn = getConnection();
             stmt = localConn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            stmt.setString(1, product.getName());
-            stmt.setString(2, product.getImageUrl());
-            stmt.setString(3, product.getDescription());
-            stmt.setDouble(4, product.getPrice());
-            stmt.setInt(5, product.getQuantity());
-            stmt.setBoolean(6, product.isFavourited());
-            
-            stmt.executeUpdate();
-            
+        stmt.setString(1, product.getName());
+        stmt.setString(2, product.getImageUrl());
+        stmt.setString(3, product.getDescription());
+        stmt.setDouble(4, product.getPrice());
+        stmt.setInt(5, product.getQuantity());
+        stmt.setBoolean(6, product.isFavourited());
+        
+        stmt.executeUpdate();
+        
             generatedKeys = stmt.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                product.setProductID(generatedKeys.getInt(1));
+        if (generatedKeys.next()) {
+            product.setProductID(generatedKeys.getInt(1));
             }
         } finally {
             if (generatedKeys != null) generatedKeys.close();
@@ -159,15 +159,15 @@ public class ProductDAO {
         try {
             localConn = getConnection();
             stmt = localConn.prepareStatement(query);
-            stmt.setString(1, product.getName());
-            stmt.setString(2, product.getImageUrl());
-            stmt.setString(3, product.getDescription());
-            stmt.setDouble(4, product.getPrice());
-            stmt.setInt(5, product.getQuantity());
-            stmt.setBoolean(6, product.isFavourited());
-            stmt.setInt(7, product.getProductID());
-            
-            stmt.executeUpdate();
+        stmt.setString(1, product.getName());
+        stmt.setString(2, product.getImageUrl());
+        stmt.setString(3, product.getDescription());
+        stmt.setDouble(4, product.getPrice());
+        stmt.setInt(5, product.getQuantity());
+        stmt.setBoolean(6, product.isFavourited());
+        stmt.setInt(7, product.getProductID());
+        
+        stmt.executeUpdate();
         } finally {
             if (stmt != null) stmt.close();
             closeConnection(localConn);
@@ -183,7 +183,7 @@ public class ProductDAO {
             localConn = getConnection();
             stmt = localConn.prepareStatement(query);
             stmt.setInt(1, productId);
-            stmt.executeUpdate();
+        stmt.executeUpdate();
         } finally {
             if (stmt != null) stmt.close();
             closeConnection(localConn);

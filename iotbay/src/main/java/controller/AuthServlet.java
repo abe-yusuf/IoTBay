@@ -17,6 +17,7 @@ import util.ValidationUtil;
 public class AuthServlet extends HttpServlet {
     private UserDAO userDAO;
     private AccessLogServlet accessLogServlet;
+    private static final String STAFF_REGISTRATION_CODE = "GROUP7ISD"; // Staff registration code
 
     @Override
     public void init() throws ServletException {
@@ -136,6 +137,8 @@ public class AuthServlet extends HttpServlet {
         String lastName = request.getParameter("lastName");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
+        boolean isStaff = "on".equals(request.getParameter("isStaff"));
+        String staffCode = request.getParameter("staffCode");
         
         // Server-side validation
         List<String> errors = new ArrayList<>();
@@ -162,6 +165,15 @@ public class AuthServlet extends HttpServlet {
         
         if (address != null && !address.isEmpty() && !ValidationUtil.isValidAddress(address)) {
             errors.add("Address must be between 5 and 200 characters");
+        }
+        
+        // Validate staff registration code if registering as staff
+        if (isStaff) {
+            if (staffCode == null || staffCode.trim().isEmpty()) {
+                errors.add("Staff registration code is required for staff registration");
+            } else if (!STAFF_REGISTRATION_CODE.equals(staffCode)) {
+                errors.add("Invalid staff registration code");
+            }
         }
         
         if (!errors.isEmpty()) {
@@ -194,16 +206,17 @@ public class AuthServlet extends HttpServlet {
             user.setLastName(lastName);
             user.setPhone(phone);
             user.setAddress(address);
-            user.setStaff(false);
+            user.setStaff(isStaff);
             user.setActive(true);
             
             userDAO.createUser(user);
             
             // Log the successful registration
-            System.out.println("New user registered: " + email);
+            System.out.println("New user registered: " + email + (isStaff ? " (Staff)" : " (Customer)"));
             
             // Redirect to login page with success message
-            response.sendRedirect(request.getContextPath() + "/auth/login?registered=true");
+            String registrationType = isStaff ? "staff" : "customer";
+            response.sendRedirect(request.getContextPath() + "/auth/login?registered=true&type=" + registrationType);
             
         } catch (SQLException e) {
             e.printStackTrace();

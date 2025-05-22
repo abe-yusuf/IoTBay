@@ -126,6 +126,21 @@
                         <input type="text" id="address" name="address">
                     </div>
                     
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label style="display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="isStaff" name="isStaff" style="width: auto;" onchange="toggleStaffCode()">
+                            <span>Register as Staff Member</span>
+                        </label>
+                    </div>
+                    
+                    <div id="staffCodeSection" class="form-group" style="display: none;">
+                        <label for="staffCode">Staff Registration Code *</label>
+                        <input type="password" id="staffCode" name="staffCode">
+                        <small style="color: #666; font-size: 0.8rem;">
+                            Required for staff registration. Contact administrator for the code.
+                        </small>
+                    </div>
+                    
                     <div style="text-align: center; margin-top: 2rem;">
                         <button type="submit" class="button">Register</button>
                     </div>
@@ -141,5 +156,15 @@
         
         <!-- Include validation script -->
         <script src="${pageContext.request.contextPath}/resources/js/validation.js"></script>
+        <script>
+            function toggleStaffCode() {
+                var staffCodeSection = document.getElementById('staffCodeSection');
+                var staffCodeInput = document.getElementById('staffCode');
+                var isStaffChecked = document.getElementById('isStaff').checked;
+                
+                staffCodeSection.style.display = isStaffChecked ? 'block' : 'none';
+                staffCodeInput.required = isStaffChecked;
+            }
+        </script>
     </body>
 </html>

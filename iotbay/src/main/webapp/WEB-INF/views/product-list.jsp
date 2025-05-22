@@ -174,13 +174,13 @@
                         <%= request.getAttribute("error") %>
                     </div>
                 <% } %>
-
+                
                 <div class="product-grid">
                     <% 
                     List<Product> products = (List<Product>) request.getAttribute("products");
                     DecimalFormat df = new DecimalFormat("0.00");
-                    if (products != null && !products.isEmpty()) {
-                        for (Product product : products) {
+                        if (products != null && !products.isEmpty()) {
+                            for (Product product : products) {
                             String imageUrl = product.getImageUrl();
                             boolean hasImage = imageUrl != null && !imageUrl.trim().isEmpty();
                     %>
@@ -193,10 +193,10 @@
                                          loading="lazy"
                                          crossorigin="anonymous"
                                          onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/resources/images/no-image.png';">
-                                <% } else { %>
+                            <% } else { %>
                                     <div class="no-image">No Image Available</div>
                                 <% } %>
-                            </div>
+                                </div>
                             <div class="product-details">
                                 <h2 class="product-name"><%= product.getName() %></h2>
                                 <p class="product-price">$<%= df.format(product.getPrice()) %></p>
@@ -204,18 +204,18 @@
                                     <p class="product-stock"><%= product.getQuantity() %> in stock</p>
                                 <% } else { %>
                                     <p class="product-stock out-of-stock">Out of stock</p>
-                                <% } %>
+                            <% } %>
                                 <a href="${pageContext.request.contextPath}/products?action=details&id=<%= product.getProductID() %>" class="btn-view">
                                     View Details
                                 </a>
                             </div>
                         </div>
                     <% 
-                        }
-                    } else {
+                            }
+                        } else {
                     %>
                         <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                            <p>No products found.</p>
+                        <p>No products found.</p>
                         </div>
                     <% } %>
                 </div>

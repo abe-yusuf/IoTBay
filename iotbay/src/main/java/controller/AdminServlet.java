@@ -17,6 +17,7 @@ import model.Order;
 import model.OrderStatus;
 import model.User;
 import util.DatabaseUtil;
+import util.ValidationUtil;
 
 @WebServlet("/admin/*")
 public class AdminServlet extends HttpServlet {
@@ -63,6 +64,10 @@ public class AdminServlet extends HttpServlet {
                 } else {
                     users = userDAO.getAllUsers();
                 }
+                
+                // Add current user to request for access control in JSP
+                User currentUser = userDAO.getUser(userId);
+                request.setAttribute("currentUser", currentUser);
                 
                 request.setAttribute("users", users);
                 request.getRequestDispatcher("/WEB-INF/views/admin/users.jsp").forward(request, response);
@@ -150,6 +155,23 @@ public class AdminServlet extends HttpServlet {
             
             User user = txUserDAO.getUser(targetUserId);
             if (user != null) {
+                // Get current user's email to check if they are admin
+                int currentUserId = (Integer) request.getSession().getAttribute("userId");
+                User currentUser = txUserDAO.getUser(currentUserId);
+                boolean isAdmin = "admin@iotbay.com".equals(currentUser.getEmail());
+                
+                // Prevent modification of admin account
+                if ("admin@iotbay.com".equals(user.getEmail())) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin account cannot be modified");
+                    return;
+                }
+                
+                // Prevent staff from modifying other staff accounts
+                if (user.isStaff() && !isAdmin) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Staff members cannot modify other staff accounts");
+                    return;
+                }
+                
                 // If deactivating the account
                 if (!isActive) {
                     // Cancel all user's orders
@@ -192,7 +214,29 @@ public class AdminServlet extends HttpServlet {
     private void deleteUser(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         int targetUserId = Integer.parseInt(request.getParameter("userId"));
-        userDAO.deleteUser(targetUserId);
+        
+        // Get user before deletion to check if it's admin or staff
+        User user = userDAO.getUser(targetUserId);
+        if (user != null) {
+            // Get current user's email to check if they are admin
+            int currentUserId = (Integer) request.getSession().getAttribute("userId");
+            User currentUser = userDAO.getUser(currentUserId);
+            boolean isAdmin = "admin@iotbay.com".equals(currentUser.getEmail());
+            
+            if ("admin@iotbay.com".equals(user.getEmail())) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin account cannot be deleted");
+                return;
+            }
+            
+            // Prevent staff from deleting other staff accounts
+            if (user.isStaff() && !isAdmin) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Staff members cannot delete other staff accounts");
+                return;
+            }
+            
+            userDAO.deleteUser(targetUserId);
+        }
+        
         response.sendRedirect(request.getContextPath() + "/admin/users");
     }
     
@@ -209,17 +253,48 @@ public class AdminServlet extends HttpServlet {
     private void editUser(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         int targetUserId = Integer.parseInt(request.getParameter("userId"));
-        String firstName = request.getParameter("firstName");
-        String lastName = request.getParameter("lastName");
-        String phone = request.getParameter("phone");
-        String address = request.getParameter("address");
         
+        // Get user before editing to check if it's admin or staff
         User user = userDAO.getUser(targetUserId);
         if (user != null) {
+            // Get current user's email to check if they are admin
+            int currentUserId = (Integer) request.getSession().getAttribute("userId");
+            User currentUser = userDAO.getUser(currentUserId);
+            boolean isAdmin = "admin@iotbay.com".equals(currentUser.getEmail());
+            
+            if ("admin@iotbay.com".equals(user.getEmail())) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin account cannot be modified");
+                return;
+            }
+            
+            // Prevent staff from editing other staff accounts
+            if (user.isStaff() && !isAdmin) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Staff members cannot modify other staff accounts");
+                return;
+            }
+            
+            String firstName = request.getParameter("firstName");
+            String lastName = request.getParameter("lastName");
+            String phone = request.getParameter("phone");
+            String address = request.getParameter("address");
+            String password = request.getParameter("password");
+            
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setPhone(phone);
             user.setAddress(address);
+            
+            // Only admin can change passwords
+            if (isAdmin && password != null && !password.trim().isEmpty()) {
+                // Validate password
+                if (!ValidationUtil.isValidPassword(password)) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, 
+                        "Password must be at least 8 characters long and contain uppercase, lowercase, and numbers");
+                    return;
+                }
+                user.setPassword(password);
+            }
+            
             userDAO.updateUser(user);
         }
         
