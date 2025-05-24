@@ -40,17 +40,17 @@ No manual database setup is required as Derby is included in the project depende
 
 ## Individual Contributions
 ### Team Member Responsibilities
-- **User Access Management**: [Team Member Name]
+- **User Access Management**:
   - Implementation of user authentication
   - User profile management
   - Access control and authorization
   
-- **IoT Device Catalogue**: [Team Member Name]
+- **IoT Device Catalogue**:
   - Product catalog implementation
   - Device management interface
   - Search and filter functionality
   
-- **Order Management**: [Team Member Name]
+- **Order Management**:
   - Shopping cart functionality
   - Order processing system
   - Order history tracking
@@ -473,9 +473,6 @@ This documentation provides a comprehensive overview of the IoTBay e-commerce pl
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
-
-## License
-[Your License]
 
 ## Recent Updates
 
