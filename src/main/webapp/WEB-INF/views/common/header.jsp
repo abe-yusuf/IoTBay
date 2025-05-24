@@ -38,7 +38,7 @@
                         
                         <li><a href="${pageContext.request.contextPath}/account">My Account</a></li>
                         <li>
-                            <form action="${pageContext.request.contextPath}/auth/logout" method="post" style="display: inline;">
+                            <form action="${pageContext.request.contextPath}/auth/logout" method="get" style="display: inline;">
                                 <button type="submit" class="btn-link">Logout</button>
                             </form>
                         </li>

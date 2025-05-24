@@ -3,6 +3,42 @@
 ## Project Overview
 IoTBay is a comprehensive e-commerce platform specialized in IoT (Internet of Things) devices and related products. The application is built using Java EE technologies and follows a Model-View-Controller (MVC) architecture pattern.
 
+## Prerequisites
+- Java Development Kit (JDK) 17 or later
+- Apache Maven 3.6 or later
+- Apache Tomcat 10.0 or later
+
+## Quick Start
+
+1. Clone the repository:
+```bash
+git clone [your-repository-url]
+cd iotbay
+```
+
+2. Build the project:
+```bash
+mvn clean install
+```
+
+3. Deploy the WAR file:
+- Copy `target/iotbay.war` to your Tomcat's webapps directory
+- Or deploy through your IDE's Tomcat integration
+
+4. Access the application:
+- Open your browser and navigate to `http://localhost:8080/iotbay`
+- Default admin credentials: 
+  - Email: admin@iotbay.com
+  - Password: admin
+
+## Database Setup
+The application uses Apache Derby as its database. The database will be automatically:
+- Created in `~/.derby/iotbay` directory (user's home directory)
+- Initialized with required tables
+- Populated with sample data
+
+No manual database setup is required as Derby is included in the project dependencies.
+
 ## Individual Contributions
 ### Team Member Responsibilities
 - **User Access Management**: [Team Member Name]
@@ -22,7 +58,7 @@ IoTBay is a comprehensive e-commerce platform specialized in IoT (Internet of Th
 
 ## Technology Stack
 - **Backend**: Java EE (Jakarta EE)
-- **Database**: Apache Derby
+- **Database**: Apache Derby (embedded)
 - **Web Server**: Apache Tomcat
 - **Frontend**: JSP (JavaServer Pages), JSTL, HTML, CSS
 - **Build Tool**: Maven
@@ -37,14 +73,13 @@ iotbay/
 │       │   ├── dao/          # Data Access Objects
 │       │   ├── model/        # Domain models
 │       │   └── util/         # Utility classes
-│       ├── resources/        # Configuration files
+│       ├── resources/
+│       │   └── sql/          # SQL scripts
 │       └── webapp/
 │           ├── WEB-INF/
-│           │   └── views/    # JSP view files
-│           ├── css/          # Stylesheets
-│           └── images/       # Image assets
-├── pom.xml                   # Maven configuration
-└── README.md                # Project documentation
+│           │   └── views/    # JSP views
+│           └── resources/    # Static resources
+└── pom.xml                   # Maven configuration
 ```
 
 ## Core Features
@@ -118,6 +153,135 @@ iotbay/
 - Session management
 - Input validation and sanitization
 - Secure database operations
+
+## Security & Validation Implementation
+
+### Server-Side Validation (ValidationUtil.java)
+- **Email Validation**: 
+  - Strict format checking for valid email addresses
+  - Domain validation
+  - Local part validation
+- **Password Requirements**:
+  - Minimum 8 characters
+  - Must contain uppercase and lowercase letters
+  - Must include numbers
+  - Special character validation
+- **Name Validation**: 
+  - Length checks (2-50 characters)
+  - Character set validation
+  - Prevent special characters
+- **Phone Number**: 
+  - Australian format validation
+  - Supports formats: +61, 04XX, (02), etc.
+  - Area code validation
+  - Length verification
+- **Address Validation**: 
+  - Length validation (5-200 characters)
+  - Format verification
+  - Special character handling
+- **Price Validation**: 
+  - Decimal format with 2 decimal places
+  - Range validation
+  - Currency symbol handling
+- **Quantity Validation**: 
+  - Positive integer checks
+  - Range validation
+  - Stock level verification
+- **HTML Sanitization**:
+  - XSS prevention
+  - Special character escaping
+  - HTML tag filtering
+  - Script injection prevention
+
+### Client-Side Validation (validation.js)
+- **Real-time Form Validation**:
+  - Instant feedback as users type
+  - Visual indicators for field status
+  - Password strength meter
+  - Cross-field validation
+- **Error Feedback**:
+  - Consolidated error summary at form top
+  - Field-specific error messages
+  - Clear validation status icons
+  - Helpful error resolution hints
+- **Input Sanitization**:
+  - Client-side character filtering
+  - Whitespace handling
+  - Special character escaping
+  - Maximum length enforcement
+
+### Enhanced Registration Form (register.jsp)
+- **User Interface**:
+  - Responsive design for all devices
+  - Clear field grouping
+  - Visual hierarchy
+  - Consistent styling
+- **Validation Features**:
+  - Real-time validation feedback
+  - Clear error indicators
+  - Success confirmation
+  - Field completion progress
+- **User Experience**:
+  - Required field indicators (*)
+  - Password strength indicator
+  - Helpful tooltips
+  - Clear error resolution steps
+- **Form Elements**:
+  - Properly labeled fields
+  - Placeholder text
+  - Help text for complex fields
+  - Accessible form controls
+
+### Security Implementation (AuthServlet.java)
+- **Input Processing**:
+  - Complete server-side validation
+  - Input sanitization
+  - XSS prevention
+  - SQL injection protection
+- **Error Handling**:
+  - Detailed error logging
+  - User-friendly error messages
+  - Validation error collection
+  - Secure error display
+- **Session Management**:
+  - Secure session handling
+  - Session timeout
+  - Session fixation prevention
+  - Proper logout procedures
+- **Authentication**:
+  - Secure password handling
+  - Failed login attempt tracking
+  - Account lockout protection
+  - Secure password reset process
+
+### Validation Workflow
+1. **Client-Side**:
+   - Immediate user feedback
+   - Prevent invalid submissions
+   - Reduce server load
+   - Enhance user experience
+
+2. **Server-Side**:
+   - Complete validation recheck
+   - Additional security checks
+   - Database constraint validation
+   - Final data sanitization
+
+3. **Error Handling**:
+   - Clear error messages
+   - Validation status tracking
+   - Error logging and monitoring
+   - Security event auditing
+
+### Security Best Practices
+- Input validation on both client and server
+- Data sanitization before processing
+- Secure session management
+- Protection against common web vulnerabilities
+- Regular security auditing
+- Comprehensive error logging
+- Secure authentication flow
+- Access control enforcement
 
 ## Database Schema
 The application uses Apache Derby with the following key tables:
@@ -303,3 +467,51 @@ The application uses Apache Derby with the following key tables:
 - User engagement metrics
 
 This documentation provides a comprehensive overview of the IoTBay e-commerce platform, covering all aspects required for detailed project reporting and analysis.
+
+## Contributing
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+[Your License]
+
+## Recent Updates
+
+### Search Functionality UI Improvements (March 2024)
+- **Access Logs Search**:
+  - Redesigned search form with centered layout
+  - Improved date range picker alignment
+  - Added consistent styling with website's orange theme (#F96E46)
+  - Enhanced visual feedback on button hover states
+
+- **Orders Search**:
+  - Implemented unified search interface with three criteria:
+    - Order ID lookup
+    - From Date filter
+    - To Date filter
+  - All search fields aligned horizontally for better space utilization
+  - Centered search button placement below inputs
+  - Added clear search functionality with proper state handling
+  - Maintained consistent styling with the platform's design language
+
+### UI/UX Enhancements
+- **Form Styling**:
+  - Standardized input field heights (40px)
+  - Consistent padding and border radius across all inputs
+  - Improved text alignment and spacing
+  - Enhanced visual hierarchy with proper label placement
+
+- **Button Improvements**:
+  - Updated primary action buttons with orange theme color
+  - Added hover effects with subtle elevation
+  - Implemented consistent button sizing
+  - Enhanced click feedback with transitions
+
+- **Layout Optimization**:
+  - Better use of whitespace in search forms
+  - Improved responsive behavior
+  - Consistent gap spacing between elements
+  - Enhanced visual balance in form layouts

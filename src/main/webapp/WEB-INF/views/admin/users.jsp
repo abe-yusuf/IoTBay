@@ -273,42 +273,58 @@
                             </thead>
                             <tbody>
                                 <c:forEach var="user" items="${users}">
-                                    <tr>
-                                        <td>${user.userId}</td>
-                                        <td>${user.firstName} ${user.lastName}</td>
-                                        <td>${user.email}</td>
-                                        <td>${user.staff ? 'Staff' : 'Customer'}</td>
-                                        <td>
-                                            <span class="status ${user.active ? 'status-active' : 'status-inactive'}">
-                                                ${user.active ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="actions">
-                                                <form action="${pageContext.request.contextPath}/admin/users" method="post" style="display: inline;">
-                                                    <input type="hidden" name="action" value="update">
-                                                    <input type="hidden" name="userId" value="${user.userId}">
-                                                    <input type="hidden" name="isActive" value="${!user.active}">
-                                                    <button type="submit" class="btn btn-primary">
-                                                        ${user.active ? 'Deactivate' : 'Activate'}
-                                                    </button>
-                                                </form>
-                                                
-                                                <button type="button" class="btn btn-primary" onclick="openEditModal(${user.userId}, '${user.firstName}', '${user.lastName}', '${user.phone}', '${user.address}')">
-                                                    Edit
-                                                </button>
-                                                
-                                                <form action="${pageContext.request.contextPath}/admin/users" method="post" style="display: inline;">
-                                                    <input type="hidden" name="action" value="delete">
-                                                    <input type="hidden" name="userId" value="${user.userId}">
-                                                    <button type="submit" class="btn btn-danger" 
-                                                            onclick="return confirm('Are you sure you want to delete this user?')">
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <%-- Only show if: 
+                                         1. The user is a customer, or
+                                         2. The current user is admin (admin@iotbay.com), or
+                                         3. It's the current user's own account
+                                    --%>
+                                    <c:if test="${not user.staff or currentUser.email eq 'admin@iotbay.com' or user.userId eq sessionScope.userId}">
+                                        <tr>
+                                            <td>${user.userId}</td>
+                                            <td>${user.firstName} ${user.lastName}</td>
+                                            <td>${user.email}</td>
+                                            <td>${user.staff ? 'Staff' : 'Customer'}</td>
+                                            <td>
+                                                <span class="status ${user.active ? 'status-active' : 'status-inactive'}">
+                                                    ${user.active ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="actions">
+                                                    <a href="${pageContext.request.contextPath}/admin/users/logs?userId=${user.userId}" class="btn btn-primary">
+                                                        View Logs
+                                                    </a>
+                                                    
+                                                    <c:if test="${user.email ne 'admin@iotbay.com'}">
+                                                        <form action="${pageContext.request.contextPath}/admin/users" method="post" style="display: inline;">
+                                                            <input type="hidden" name="action" value="update">
+                                                            <input type="hidden" name="userId" value="${user.userId}">
+                                                            <input type="hidden" name="isActive" value="${!user.active}">
+                                                            <button type="submit" class="btn btn-primary">
+                                                                ${user.active ? 'Deactivate' : 'Activate'}
+                                                            </button>
+                                                        </form>
+                                                        
+                                                        <button type="button" class="btn btn-primary" onclick="openEditModal(${user.userId}, '${user.firstName}', '${user.lastName}', '${user.phone}', '${user.address}')">
+                                                            Edit
+                                                        </button>
+                                                        
+                                                        <form action="${pageContext.request.contextPath}/admin/users" method="post" style="display: inline;">
+                                                            <input type="hidden" name="action" value="delete">
+                                                            <input type="hidden" name="userId" value="${user.userId}">
+                                                            <button type="submit" class="btn btn-danger" 
+                                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </c:if>
+                                                    <c:if test="${user.email eq 'admin@iotbay.com'}">
+                                                        <span style="color: #694A38; font-style: italic; margin-left: 10px;">Admin account cannot be modified</span>
+                                                    </c:if>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:if>
                                 </c:forEach>
                             </tbody>
                         </table>
@@ -351,6 +367,16 @@
                     <input type="text" id="editAddress" name="address">
                 </div>
                 
+                <c:if test="${currentUser.email eq 'admin@iotbay.com'}">
+                    <div class="form-group">
+                        <label for="editPassword">New Password:</label>
+                        <input type="password" id="editPassword" name="password" placeholder="Leave blank to keep current password">
+                        <small style="color: #666; font-size: 0.8rem;">
+                            Must be at least 8 characters long and contain uppercase, lowercase, and numbers
+                        </small>
+                    </div>
+                </c:if>
+                
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
         </div>
@@ -365,6 +391,10 @@
         document.getElementById('editLastName').value = lastName;
         document.getElementById('editPhone').value = phone || '';
         document.getElementById('editAddress').value = address || '';
+        // Clear password field for security
+        if (document.getElementById('editPassword')) {
+            document.getElementById('editPassword').value = '';
+        }
         document.getElementById('editModal').style.display = 'block';
     }
 

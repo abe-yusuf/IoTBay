@@ -93,4 +93,58 @@ public class AccessLogDAO {
         }
         return logs;
     }
+
+    public List<AccessLog> searchAccessLogs(int userId, String fromDate, String toDate) throws SQLException {
+        List<AccessLog> logs = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT * FROM access_logs WHERE user_id = ? "
+        );
+        
+        List<Object> params = new ArrayList<>();
+        params.add(userId);
+        
+        // Add date range filter if provided
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            sql.append("AND login_time >= ? ");
+            params.add(java.sql.Date.valueOf(fromDate.trim()));
+        }
+        if (toDate != null && !toDate.trim().isEmpty()) {
+            sql.append("AND login_time < {fn TIMESTAMPADD(SQL_TSI_DAY, 1, ?)} ");
+            params.add(java.sql.Date.valueOf(toDate.trim()));
+        }
+        
+        sql.append("ORDER BY login_time DESC");
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DatabaseUtil.getConnection();
+            stmt = conn.prepareStatement(sql.toString());
+            
+            // Set parameters
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+            
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                AccessLog log = new AccessLog(
+                    rs.getInt("log_id"),
+                    rs.getInt("user_id"),
+                    rs.getTimestamp("login_time"),
+                    rs.getTimestamp("logout_time"),
+                    rs.getString("ip_address")
+                );
+                logs.add(log);
+            }
+            return logs;
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        }
+    }
 } 

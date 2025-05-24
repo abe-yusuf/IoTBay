@@ -105,8 +105,20 @@
                     <div class="error-message"><%= errorMessage %></div>
                 <% } %>
                 
-                <% if (message != null) { %>
-                    <div class="success-message"><%= message %></div>
+                <% if (request.getParameter("registered") != null) { 
+                    String type = request.getParameter("type");
+                    String registrationMessage;
+                    if ("staff".equals(type)) {
+                        registrationMessage = "Staff account successfully registered! Please log in with your credentials.";
+                    } else {
+                        registrationMessage = "Account successfully registered! Please log in with your credentials.";
+                    }
+                %>
+                    <div class="success-message"><%= registrationMessage %></div>
+                <% } %>
+                
+                <% if (request.getParameter("logout") != null) { %>
+                    <div class="success-message">You have been successfully logged out.</div>
                 <% } %>
 
                 <form action="${pageContext.request.contextPath}/auth/login" method="post">

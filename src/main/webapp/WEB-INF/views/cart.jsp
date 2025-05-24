@@ -165,7 +165,7 @@
                 <div class="cart-actions-right">
                     <form action="${pageContext.request.contextPath}/cart" method="post">
                         <input type="hidden" name="action" value="clear">
-                        <button type="submit" class="btn btn-secondary">Clear Cart</button>
+                        <button type="submit" class="btn btn-secondary">Clear Saved Cart</button>
                     </form>
                     <form action="${pageContext.request.contextPath}/orders" method="post">
                         <input type="hidden" name="action" value="create">

@@ -1,7 +1,5 @@
 package model;
 
-import java.io.Serializable;
-
 public class Product {
     private int productID;
     private String name;
@@ -10,12 +8,13 @@ public class Product {
     private double price;
     private int quantity;
     private boolean favourited;
+    private String productType;
 
     // Constructors
     public Product() {}
 
     public Product(int productID, String name, String imageUrl, String description, double price, int quantity,
-            boolean favourited) {
+            boolean favourited, String productType) {
         this.productID = productID;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -23,6 +22,7 @@ public class Product {
         this.price = price;
         this.quantity = quantity;
         this.favourited = favourited;
+        this.productType = productType;
     }
     // Getters & Setters
     public int getProductID() {
@@ -81,6 +81,13 @@ public class Product {
         this.favourited = favourited;
     }
 
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
 }
 
 

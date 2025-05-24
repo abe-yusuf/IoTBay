@@ -12,16 +12,31 @@ import model.User;
 import util.DatabaseUtil;
 
 public class UserDAO {
+    private Connection conn;
+    private boolean isExternalConnection;
+    
+    public UserDAO(Connection conn) {
+        this.conn = conn;
+        this.isExternalConnection = true;
+    }
+    
+    public UserDAO() {
+        this.isExternalConnection = false;
+    }
     
     private Connection getConnection() throws SQLException {
-        try {
-            return DatabaseUtil.getConnection();
-        } catch (SQLException e) {
-            System.err.println("Error getting database connection: " + e.getMessage());
-            throw e;
+        if (isExternalConnection) {
+            return conn;
+        }
+        return DatabaseUtil.getConnection();
+    }
+    
+    private void closeConnection(Connection conn) throws SQLException {
+        if (!isExternalConnection && conn != null) {
+            conn.close();
         }
     }
-
+    
     public User createUser(User user) throws SQLException {
         String sql = "INSERT INTO users (email, password, first_name, last_name, phone, address, is_staff, active) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -74,13 +89,16 @@ public class UserDAO {
     }
 
     public User getUser(int userId) throws SQLException {
-        String sql = "SELECT * FROM users WHERE user_id = ?";
+        String query = "SELECT * FROM users WHERE user_id = ?";
+        Connection localConn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+        try {
+            localConn = getConnection();
+            stmt = localConn.prepareStatement(query);
             stmt.setInt(1, userId);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             
             if (rs.next()) {
                 return new User(
@@ -95,8 +113,12 @@ public class UserDAO {
                     rs.getBoolean("active")
                 );
             }
+            return null;
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            closeConnection(localConn);
         }
-        return null;
     }
 
     public List<User> getAllUsers() throws SQLException {
@@ -126,27 +148,27 @@ public class UserDAO {
     }
 
     public void updateUser(User user) throws SQLException {
-        String sql = "UPDATE users SET " +
-                    "first_name = ?, " +
-                    "last_name = ?, " +
-                    "phone = ?, " +
-                    "address = ?, " +
-                    "password = ?, " +
-                    "active = ? " +
-                    "WHERE user_id = ?";
+        String query = "UPDATE users SET email = ?, password = ?, first_name = ?, last_name = ?, phone = ?, address = ?, is_staff = ?, active = ? WHERE user_id = ?";
+        Connection localConn = null;
+        PreparedStatement stmt = null;
         
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, user.getFirstName());
-            stmt.setString(2, user.getLastName());
-            stmt.setString(3, user.getPhone());
-            stmt.setString(4, user.getAddress());
-            stmt.setString(5, user.getPassword());
-            stmt.setBoolean(6, user.isActive());
-            stmt.setInt(7, user.getUserId());
+        try {
+            localConn = getConnection();
+            stmt = localConn.prepareStatement(query);
+            stmt.setString(1, user.getEmail());
+            stmt.setString(2, user.getPassword());
+            stmt.setString(3, user.getFirstName());
+            stmt.setString(4, user.getLastName());
+            stmt.setString(5, user.getPhone());
+            stmt.setString(6, user.getAddress());
+            stmt.setBoolean(7, user.isStaff());
+            stmt.setBoolean(8, user.isActive());
+            stmt.setInt(9, user.getUserId());
             
             stmt.executeUpdate();
+        } finally {
+            if (stmt != null) stmt.close();
+            closeConnection(localConn);
         }
     }
 

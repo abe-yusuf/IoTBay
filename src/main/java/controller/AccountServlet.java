@@ -1,10 +1,12 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 import dao.AccessLogDAO;
+import dao.OrderDAO;
 import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +15,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.AccessLog;
+import model.Order;
+import model.OrderStatus;
 import model.User;
+import util.DatabaseUtil;
 
 @WebServlet("/account/*")
 public class AccountServlet extends HttpServlet {
@@ -37,9 +42,21 @@ public class AccountServlet extends HttpServlet {
             User user = userDAO.getUser(userId);
             request.setAttribute("user", user);
             
-            // Get access logs
-            List<AccessLog> accessLogs = accessLogDAO.getUserAccessLogs(userId);
+            // Get search parameters
+            String fromDate = request.getParameter("fromDate");
+            String toDate = request.getParameter("toDate");
+            
+            // Get access logs with search
+            List<AccessLog> accessLogs;
+            if (fromDate != null || toDate != null) {
+                accessLogs = accessLogDAO.searchAccessLogs(userId, fromDate, toDate);
+            } else {
+                accessLogs = accessLogDAO.getUserAccessLogs(userId);
+            }
+            
             request.setAttribute("accessLogs", accessLogs);
+            request.setAttribute("fromDate", fromDate);
+            request.setAttribute("toDate", toDate);
             
             request.getRequestDispatcher("/WEB-INF/views/account/profile.jsp").forward(request, response);
         } catch (SQLException e) {
@@ -115,17 +132,62 @@ public class AccountServlet extends HttpServlet {
 
     private void deactivateAccount(HttpServletRequest request, HttpServletResponse response, int userId) 
             throws SQLException, IOException {
-        User user = userDAO.getUser(userId);
-        user.setActive(false);
-        userDAO.updateUser(user);
-        
-        // Invalidate the session
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
+        Connection conn = null;
+        try {
+            conn = DatabaseUtil.getConnection();
+            conn.setAutoCommit(false);
+            
+            // Create DAOs with transaction connection
+            UserDAO txUserDAO = new UserDAO(conn);
+            OrderDAO txOrderDAO = new OrderDAO(conn);
+            
+            // Get user
+            User user = txUserDAO.getUser(userId);
+            if (user == null) {
+                throw new SQLException("User not found");
+            }
+            
+            // Deactivate account
+            user.setActive(false);
+            txUserDAO.updateUser(user);
+            
+            // Cancel all user's orders
+            List<Order> userOrders = txOrderDAO.getOrdersByUserId(userId);
+            for (Order order : userOrders) {
+                if (!order.getStatus().equals("CANCELLED")) {
+                    txOrderDAO.updateOrderStatus(order.getOrderId(), OrderStatus.CANCELLED);
+                }
+            }
+            
+            conn.commit();
+            
+            // Invalidate the session
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            
+            // Redirect to login page with message
+            response.sendRedirect(request.getContextPath() + "/auth/login?message=Your account has been deactivated. Contact support to reactivate.");
+            
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        
-        // Redirect to login page with message
-        response.sendRedirect(request.getContextPath() + "/auth/login?message=Your account has been deactivated. Contact support to reactivate.");
     }
 } 

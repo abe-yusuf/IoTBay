@@ -12,9 +12,6 @@
             max-width: 1200px;
             margin: 2rem auto;
             padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -24,11 +21,93 @@
             text-align: center;
         }
 
+        .search-form {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .date-range-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            justify-content: center;
+        }
+        
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 250px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        
+        .form-group input[type="date"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 40px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .search-form button {
+            padding: 0 32px;
+            background-color: #F96E46;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            height: 40px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
+        
+        .search-form button:hover {
+            background-color: #e85e36;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .clear-search {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            height: 40px;
+            line-height: 40px;
+            margin-left: 12px;
+        }
+        
+        .clear-search:hover {
+            text-decoration: underline;
+        }
+
         .orders-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 2rem;
             background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .orders-table th {
@@ -68,29 +147,14 @@
             transform: translateY(-1px);
         }
 
-        .actions {
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        .actions .btn {
-            background-color: #F96E46;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
-        }
-
-        .actions .btn:hover {
-            background-color: #e85e36;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
         .no-orders {
             text-align: center;
             padding: 2rem;
             color: #666;
-            font-size: 1.1rem;
+            font-style: italic;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .order-items {
@@ -148,10 +212,36 @@
     <div class="container">
         <h1>My Orders</h1>
         
+        <form class="search-form" action="${pageContext.request.contextPath}/orders" method="get">
+            <div class="date-range-container">
+                <div class="form-group">
+                    <label for="orderId">Order ID:</label>
+                    <input type="text" id="orderId" name="orderId" value="${searchOrderId}" placeholder="Enter order ID">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fromDate">From Date:</label>
+                    <input type="date" id="fromDate" name="fromDate" value="${fromDate}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="toDate">To Date:</label>
+                    <input type="date" id="toDate" name="toDate" value="${toDate}">
+                </div>
+            </div>
+            
+            <div>
+                <button type="submit">Search</button>
+                <c:if test="${searchOrderId != null || fromDate != null || toDate != null}">
+                    <a href="${pageContext.request.contextPath}/orders" class="clear-search">Clear</a>
+                </c:if>
+            </div>
+        </form>
+
         <c:if test="${empty orders}">
             <div class="no-orders">
-                <p>You haven't placed any orders yet.</p>
-                <a href="${pageContext.request.contextPath}/products" class="btn">Start Shopping</a>
+                <p>No orders found for the selected criteria.</p>
+                <a href="${pageContext.request.contextPath}/products" class="btn btn-small">Start Shopping</a>
             </div>
         </c:if>
         
@@ -193,10 +283,6 @@
                 </tbody>
             </table>
         </c:if>
-        
-        <div class="actions">
-            <a href="${pageContext.request.contextPath}/products" class="btn">Continue Shopping</a>
-        </div>
     </div>
     
     <jsp:include page="../common/footer.jsp" />

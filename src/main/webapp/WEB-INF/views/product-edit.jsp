@@ -90,6 +90,17 @@
                         <input type="number" id="quantity" name="quantity" min="0" value="${product.quantity}" required/>
                     </div>
 
+                    <div class="form-group">
+                        <label for="productType">Product Type: </label>
+                        <select id="productType" name="productType" required class="form-input">
+                            <option value="">Select a type...</option>
+                            <option value="Climate Control" ${product.productType eq 'Climate Control' ? 'selected' : ''}>Climate Control</option>
+                            <option value="Security" ${product.productType eq 'Security' ? 'selected' : ''}>Security</option>
+                            <option value="Lighting" ${product.productType eq 'Lighting' ? 'selected' : ''}>Lighting</option>
+                            <option value="Entertainment" ${product.productType eq 'Entertainment' ? 'selected' : ''}>Entertainment</option>
+                        </select>
+                    </div>
+
                     <div class="btn-container">
                         <a href="products?action=manage" class="back-link">Back to Management</a>
                         <button type="submit" class="btn-primary">Update Device</button>

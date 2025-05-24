@@ -30,15 +30,22 @@ public class ProductServlet extends HttpServlet {
             if (action == null) {
                 // Default: show product list - publicly accessible
                 String searchTerm = request.getParameter("search");
+                String productType = request.getParameter("type");
                 List<Product> products;
                 
                 if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                     products = productDAO.searchProducts(searchTerm);
                     request.setAttribute("searchTerm", searchTerm);
+                } else if (productType != null && !productType.trim().isEmpty()) {
+                    products = productDAO.getProductsByType(productType);
+                    request.setAttribute("selectedType", productType);
                 } else {
                     products = productDAO.getAllProducts();
                 }
                 
+                // Get all product types for the filter dropdown
+                List<String> productTypes = productDAO.getAllProductTypes();
+                request.setAttribute("productTypes", productTypes);
                 request.setAttribute("products", products);
                 request.getRequestDispatcher("/WEB-INF/views/product-list.jsp").forward(request, response);
             } else if (action.equals("manage")) {
@@ -147,7 +154,7 @@ public class ProductServlet extends HttpServlet {
                     }
                 } catch (NumberFormatException e) {
                     response.sendRedirect(request.getContextPath() + "/products?error=Invalid product ID");
-            }
+                }
             }
             
         } catch (SQLException ex) {
@@ -199,10 +206,17 @@ public class ProductServlet extends HttpServlet {
                 String description = request.getParameter("description");
                 double price = Double.parseDouble(request.getParameter("price"));
                 int quantity = Integer.parseInt(request.getParameter("quantity"));
+                String productType = request.getParameter("productType");
                 
                 // Server-side validation
                 if (name == null || name.trim().isEmpty()) {
                     request.setAttribute("error", "Product name is required");
+                    request.getRequestDispatcher("/WEB-INF/views/product-add.jsp").forward(request, response);
+                    return;
+                }
+                
+                if (productType == null || productType.trim().isEmpty()) {
+                    request.setAttribute("error", "Product type is required");
                     request.getRequestDispatcher("/WEB-INF/views/product-add.jsp").forward(request, response);
                     return;
                 }
@@ -226,6 +240,7 @@ public class ProductServlet extends HttpServlet {
                 product.setPrice(price);
                 product.setQuantity(quantity);
                 product.setFavourited(false);
+                product.setProductType(productType);
                 
                 productDAO.addProduct(product);
                 
@@ -238,10 +253,17 @@ public class ProductServlet extends HttpServlet {
                 String description = request.getParameter("description");
                 double price = Double.parseDouble(request.getParameter("price"));
                 int quantity = Integer.parseInt(request.getParameter("quantity"));
+                String productType = request.getParameter("productType");
                 
                 // Server-side validation
                 if (name == null || name.trim().isEmpty()) {
                     request.setAttribute("error", "Product name is required");
+                    request.getRequestDispatcher("/WEB-INF/views/product-edit.jsp").forward(request, response);
+                    return;
+                }
+                
+                if (productType == null || productType.trim().isEmpty()) {
+                    request.setAttribute("error", "Product type is required");
                     request.getRequestDispatcher("/WEB-INF/views/product-edit.jsp").forward(request, response);
                     return;
                 }
@@ -266,6 +288,7 @@ public class ProductServlet extends HttpServlet {
                 product.setPrice(price);
                 product.setQuantity(quantity);
                 product.setFavourited(false);
+                product.setProductType(productType);
                 
                 productDAO.updateProduct(product);
                 

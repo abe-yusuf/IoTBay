@@ -1,7 +1,9 @@
 dao/CartDAO.class
+util/ValidationUtil.class
 model/Product.class
 controller/IndexServlet.class
 controller/AccessLogServlet.class
+controller/AdminAccessLogServlet.class
 model/AccessLog.class
 controller/ProductServlet.class
 model/Cart.class
@@ -9,7 +11,6 @@ util/DatabaseInitListener.class
 model/CartItem.class
 controller/AuthServlet.class
 dao/OrderDAO.class
-dao/DBConnector.class
 model/Order.class
 model/OrderItem.class
 dao/ProductDAO.class
@@ -23,3 +24,4 @@ controller/AdminServlet.class
 model/User.class
 controller/CartServlet.class
 controller/AccountServlet.class
+controller/LegalServlet.class

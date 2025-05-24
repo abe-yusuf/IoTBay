@@ -9,31 +9,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Product;
+import util.DatabaseUtil;
 
 public class ProductDAO {
     
     private Connection conn;
+    private boolean isExternalConnection;
     
     public ProductDAO(Connection conn) {
         this.conn = conn;
+        this.isExternalConnection = true;
+    }
+    
+    public ProductDAO() {
+        this.isExternalConnection = false;
+    }
+    
+    private Connection getConnection() throws SQLException {
+        if (isExternalConnection) {
+            return conn;
+        }
+        return DatabaseUtil.getConnection();
+    }
+    
+    private void closeConnection(Connection conn) throws SQLException {
+        if (!isExternalConnection && conn != null) {
+            conn.close();
+        }
     }
     
     public List<Product> getAllProducts() throws SQLException {
         List<Product> products = new ArrayList<>();
         String query = "SELECT * FROM PRODUCTS";
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
+        Connection localConn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
         
-        while (rs.next()) {
-            Product product = new Product();
-            product.setProductID(rs.getInt("PRODUCT_ID"));
-            product.setName(rs.getString("NAME"));
-            product.setImageUrl(rs.getString("IMAGE_URL"));
-            product.setDescription(rs.getString("DESCRIPTION"));
-            product.setPrice(rs.getDouble("PRICE"));
-            product.setQuantity(rs.getInt("QUANTITY"));
-            product.setFavourited(rs.getBoolean("FAVOURITED"));
-            products.add(product);
+        try {
+            localConn = getConnection();
+            stmt = localConn.createStatement();
+            rs = stmt.executeQuery(query);
+        
+            while (rs.next()) {
+                Product product = new Product();
+                product.setProductID(rs.getInt("PRODUCT_ID"));
+                product.setName(rs.getString("NAME"));
+                product.setImageUrl(rs.getString("IMAGE_URL"));
+                product.setDescription(rs.getString("DESCRIPTION"));
+                product.setPrice(rs.getDouble("PRICE"));
+                product.setQuantity(rs.getInt("QUANTITY"));
+                product.setFavourited(rs.getBoolean("FAVOURITED"));
+                product.setProductType(rs.getString("PRODUCT_TYPE"));
+                products.add(product);
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            closeConnection(localConn);
         }
         return products;
     }
@@ -55,6 +87,7 @@ public class ProductDAO {
             product.setPrice(rs.getDouble("PRICE"));
             product.setQuantity(rs.getInt("QUANTITY"));
             product.setFavourited(rs.getBoolean("FAVOURITED"));
+            product.setProductType(rs.getString("PRODUCT_TYPE"));
             products.add(product);
         }
         return products;
@@ -62,11 +95,114 @@ public class ProductDAO {
     
     public Product getProductById(int productId) throws SQLException {
         String query = "SELECT * FROM PRODUCTS WHERE PRODUCT_ID = ?";
+        Connection localConn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            localConn = getConnection();
+            stmt = localConn.prepareStatement(query);
+            stmt.setInt(1, productId);
+            rs = stmt.executeQuery();
+        
+            if (rs.next()) {
+                Product product = new Product();
+                product.setProductID(rs.getInt("PRODUCT_ID"));
+                product.setName(rs.getString("NAME"));
+                product.setImageUrl(rs.getString("IMAGE_URL"));
+                product.setDescription(rs.getString("DESCRIPTION"));
+                product.setPrice(rs.getDouble("PRICE"));
+                product.setQuantity(rs.getInt("QUANTITY"));
+                product.setFavourited(rs.getBoolean("FAVOURITED"));
+                product.setProductType(rs.getString("PRODUCT_TYPE"));
+                return product;
+            }
+            return null;
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            closeConnection(localConn);
+        }
+    }
+    
+    public void addProduct(Product product) throws SQLException {
+        String query = "INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED, PRODUCT_TYPE) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        Connection localConn = null;
+        PreparedStatement stmt = null;
+        ResultSet generatedKeys = null;
+        
+        try {
+            localConn = getConnection();
+            stmt = localConn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, product.getName());
+            stmt.setString(2, product.getImageUrl());
+            stmt.setString(3, product.getDescription());
+            stmt.setDouble(4, product.getPrice());
+            stmt.setInt(5, product.getQuantity());
+            stmt.setBoolean(6, product.isFavourited());
+            stmt.setString(7, product.getProductType());
+            
+            stmt.executeUpdate();
+            
+            generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                product.setProductID(generatedKeys.getInt(1));
+            }
+        } finally {
+            if (generatedKeys != null) generatedKeys.close();
+            if (stmt != null) stmt.close();
+            closeConnection(localConn);
+        }
+    }
+    
+    public void updateProduct(Product product) throws SQLException {
+        String query = "UPDATE PRODUCTS SET NAME = ?, IMAGE_URL = ?, DESCRIPTION = ?, PRICE = ?, QUANTITY = ?, FAVOURITED = ?, PRODUCT_TYPE = ? WHERE PRODUCT_ID = ?";
+        Connection localConn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            localConn = getConnection();
+            stmt = localConn.prepareStatement(query);
+            stmt.setString(1, product.getName());
+            stmt.setString(2, product.getImageUrl());
+            stmt.setString(3, product.getDescription());
+            stmt.setDouble(4, product.getPrice());
+            stmt.setInt(5, product.getQuantity());
+            stmt.setBoolean(6, product.isFavourited());
+            stmt.setString(7, product.getProductType());
+            stmt.setInt(8, product.getProductID());
+            
+            stmt.executeUpdate();
+        } finally {
+            if (stmt != null) stmt.close();
+            closeConnection(localConn);
+        }
+    }
+    
+    public void deleteProduct(int productId) throws SQLException {
+        String query = "DELETE FROM PRODUCTS WHERE PRODUCT_ID = ?";
+        Connection localConn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            localConn = getConnection();
+            stmt = localConn.prepareStatement(query);
+            stmt.setInt(1, productId);
+        stmt.executeUpdate();
+        } finally {
+            if (stmt != null) stmt.close();
+            closeConnection(localConn);
+        }
+    }
+
+    public List<Product> getProductsByType(String productType) throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String query = "SELECT * FROM PRODUCTS WHERE PRODUCT_TYPE = ? ORDER BY NAME";
         PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.setInt(1, productId);
+        stmt.setString(1, productType);
         ResultSet rs = stmt.executeQuery();
         
-        if (rs.next()) {
+        while (rs.next()) {
             Product product = new Product();
             product.setProductID(rs.getInt("PRODUCT_ID"));
             product.setName(rs.getString("NAME"));
@@ -75,118 +211,21 @@ public class ProductDAO {
             product.setPrice(rs.getDouble("PRICE"));
             product.setQuantity(rs.getInt("QUANTITY"));
             product.setFavourited(rs.getBoolean("FAVOURITED"));
-            return product;
+            product.setProductType(rs.getString("PRODUCT_TYPE"));
+            products.add(product);
         }
-        return null;
+        return products;
     }
-    
-    public void addProduct(Product product) throws SQLException {
-        String query = "INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED) VALUES (?, ?, ?, ?, ?, ?)";
-        PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-        stmt.setString(1, product.getName());
-        stmt.setString(2, product.getImageUrl());
-        stmt.setString(3, product.getDescription());
-        stmt.setDouble(4, product.getPrice());
-        stmt.setInt(5, product.getQuantity());
-        stmt.setBoolean(6, product.isFavourited());
+
+    public List<String> getAllProductTypes() throws SQLException {
+        List<String> productTypes = new ArrayList<>();
+        String query = "SELECT DISTINCT PRODUCT_TYPE FROM PRODUCTS ORDER BY PRODUCT_TYPE";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
         
-        stmt.executeUpdate();
-        
-        ResultSet generatedKeys = stmt.getGeneratedKeys();
-        if (generatedKeys.next()) {
-            product.setProductID(generatedKeys.getInt(1));
+        while (rs.next()) {
+            productTypes.add(rs.getString("PRODUCT_TYPE"));
         }
-    }
-    
-    public void updateProduct(Product product) throws SQLException {
-        String query = "UPDATE PRODUCTS SET NAME = ?, IMAGE_URL = ?, DESCRIPTION = ?, PRICE = ?, QUANTITY = ?, FAVOURITED = ? WHERE PRODUCT_ID = ?";
-        PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.setString(1, product.getName());
-        stmt.setString(2, product.getImageUrl());
-        stmt.setString(3, product.getDescription());
-        stmt.setDouble(4, product.getPrice());
-        stmt.setInt(5, product.getQuantity());
-        stmt.setBoolean(6, product.isFavourited());
-        stmt.setInt(7, product.getProductID());
-        
-        stmt.executeUpdate();
-    }
-    
-    public void deleteProduct(int productId) throws SQLException {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        
-        // Set lock timeout to 60 seconds (default is 60000 milliseconds)
-        try {
-            conn.createStatement().execute("CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.locks.waitTimeout', '60')");
-        } catch (SQLException e) {
-            // Log the error but continue - not critical if this fails
-            System.err.println("Warning: Could not set lock timeout: " + e.getMessage());
-        }
-        
-        // Start transaction
-        boolean originalAutoCommit = conn.getAutoCommit();
-        conn.setAutoCommit(false);
-        
-        try {
-            // First check if product exists
-            stmt = conn.prepareStatement("SELECT COUNT(*) FROM products WHERE product_id = ?");
-            stmt.setInt(1, productId);
-            rs = stmt.executeQuery();
-            
-            if (rs.next() && rs.getInt(1) == 0) {
-                throw new SQLException("Product not found");
-            }
-            
-            // Check for references in cart items
-            stmt = conn.prepareStatement("SELECT COUNT(*) FROM cart_items WHERE product_id = ?");
-            stmt.setInt(1, productId);
-            rs = stmt.executeQuery();
-            
-            if (rs.next() && rs.getInt(1) > 0) {
-                throw new SQLException("Cannot delete: Product is in users' carts");
-            }
-            
-            // Check for references in order items
-            stmt = conn.prepareStatement("SELECT COUNT(*) FROM order_items WHERE product_id = ?");
-            stmt.setInt(1, productId);
-            rs = stmt.executeQuery();
-            
-            if (rs.next() && rs.getInt(1) > 0) {
-                throw new SQLException("Cannot delete: Product is referenced in orders");
-            }
-            
-            // If we get here, it's safe to delete
-            stmt = conn.prepareStatement("DELETE FROM products WHERE product_id = ?");
-        stmt.setInt(1, productId);
-        
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new SQLException("Failed to delete product");
-            }
-            
-            // Commit the transaction
-            conn.commit();
-        } catch (SQLException e) {
-            // Rollback on error
-            try {
-                conn.rollback();
-            } catch (SQLException rollbackEx) {
-                // Log rollback error
-                System.err.println("Error during rollback: " + rollbackEx.getMessage());
-            }
-            throw e;
-        } finally {
-            // Restore original auto-commit state
-            try {
-                conn.setAutoCommit(originalAutoCommit);
-            } catch (SQLException e) {
-                System.err.println("Error restoring auto-commit: " + e.getMessage());
-            }
-            
-            // Close resources
-            if (rs != null) try { rs.close(); } catch (SQLException e) { /* ignore */ }
-            if (stmt != null) try { stmt.close(); } catch (SQLException e) { /* ignore */ }
-        }
+        return productTypes;
     }
 }

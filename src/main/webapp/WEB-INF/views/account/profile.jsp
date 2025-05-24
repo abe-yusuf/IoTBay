@@ -270,6 +270,144 @@
             color: #666;
             margin-bottom: 1rem;
         }
+
+        .access-logs {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .access-logs h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .access-logs .search-form {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .access-logs .date-range-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+            justify-content: center;
+        }
+        
+        .access-logs .search-form .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 250px;
+        }
+        
+        .access-logs .search-form .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        
+        .access-logs .search-form .form-group input[type="date"],
+        .access-logs .search-form .form-group input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 40px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .access-logs .search-form button {
+            padding: 0 32px;
+            background-color: #F96E46;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            height: 40px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
+        
+        .access-logs .search-form button:hover {
+            background-color: #e85e36;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .access-logs .search-form .clear-search {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            height: 40px;
+            line-height: 40px;
+            margin-left: 12px;
+        }
+        
+        .access-logs .search-form .clear-search:hover {
+            text-decoration: underline;
+        }
+        
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .logs-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .logs-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .logs-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Restore original form group styles for other sections */
+        .profile-section .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-section .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #694A38;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .profile-section .form-group input,
+        .profile-section .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -350,44 +488,66 @@
                 </form>
             </div>
             
-            <div class="profile-section">
-                <h2>Access History</h2>
-                <div class="table-container">
-                    <c:choose>
-                        <c:when test="${not empty accessLogs}">
-                            <table class="table">
-                                <thead>
+            <div class="access-logs">
+                <h2>Access Logs</h2>
+                
+                <form class="search-form" action="${pageContext.request.contextPath}/account" method="get">
+                    <div class="date-range-container">
+                        <div class="form-group">
+                            <label for="fromDate">From Date:</label>
+                            <input type="date" id="fromDate" name="fromDate" value="${fromDate}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="toDate">To Date:</label>
+                            <input type="date" id="toDate" name="toDate" value="${toDate}">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button type="submit">Search</button>
+                        <c:if test="${fromDate != null || toDate != null}">
+                            <a href="${pageContext.request.contextPath}/account" class="clear-search">Clear</a>
+                        </c:if>
+                    </div>
+                </form>
+                
+                <c:choose>
+                    <c:when test="${not empty accessLogs}">
+                        <table class="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>Login Time</th>
+                                    <th>Logout Time</th>
+                                    <th>IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="log" items="${accessLogs}">
                                     <tr>
-                                        <th>Login Time</th>
-                                        <th>Logout Time</th>
-                                        <th>IP Address</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:forEach var="log" items="${accessLogs}">
-                                        <tr>
-                                            <td><fmt:formatDate value="${log.loginTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                            <td>
-                                                <c:if test="${not empty log.logoutTime}">
+                                        <td><fmt:formatDate value="${log.loginTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${empty log.logoutTime}">
+                                                    <span style="color: #28a745;">Currently Active</span>
+                                                </c:when>
+                                                <c:otherwise>
                                                     <fmt:formatDate value="${log.logoutTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-                                                </c:if>
-                                                <c:if test="${empty log.logoutTime}">
-                                                    <span class="currently-active">Currently Active</span>
-                                                </c:if>
-                                            </td>
-                                            <td>${log.ipAddress}</td>
-                                        </tr>
-                                    </c:forEach>
-                                </tbody>
-                            </table>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="no-logs">
-                                No access history found.
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>${log.ipAddress}</td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-logs">
+                            No access logs found for the selected period.
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
             
             <div class="profile-section">

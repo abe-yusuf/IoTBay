@@ -58,7 +58,6 @@
         
         <main>
             <section class="logout-container">
-                <% session.invalidate(); %>
                 <h2>Successfully Logged Out</h2>
                 <p>Thank you for visiting IoTBay. We hope to see you again soon!</p>
                 <a href="${pageContext.request.contextPath}/" class="btn-home">Return to Home</a>

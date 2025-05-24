@@ -162,11 +162,19 @@
         <main>
             <div class="container">
                 <div class="header">
-                    <h1>IoT Device Catalog</h1>
-                    <form action="products" method="get" style="margin: 0;">
-                        <input type="text" name="search" class="search-box" placeholder="Search devices..." 
-                               value="${searchTerm != null ? searchTerm : ''}" />
-                    </form>
+                    <h1>IoT Device Catalogue</h1>
+                    <div class="header-actions">
+                        <form action="products" method="get" style="margin: 0; display: flex; gap: 15px;">
+                            <input type="text" name="search" class="search-box" placeholder="Search devices..." 
+                                   value="${searchTerm != null ? searchTerm : ''}" />
+                            <select name="type" class="search-box" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
+                                <option value="">All Types</option>
+                                <c:forEach var="type" items="${productTypes}">
+                                    <option value="${type}" ${type eq selectedType ? 'selected' : ''}>${type}</option>
+                                </c:forEach>
+                            </select>
+                        </form>
+                    </div>
                 </div>
 
                 <% if (request.getAttribute("error") != null) { %>
@@ -174,13 +182,13 @@
                         <%= request.getAttribute("error") %>
                     </div>
                 <% } %>
-
+                
                 <div class="product-grid">
                     <% 
                     List<Product> products = (List<Product>) request.getAttribute("products");
                     DecimalFormat df = new DecimalFormat("0.00");
-                    if (products != null && !products.isEmpty()) {
-                        for (Product product : products) {
+                        if (products != null && !products.isEmpty()) {
+                            for (Product product : products) {
                             String imageUrl = product.getImageUrl();
                             boolean hasImage = imageUrl != null && !imageUrl.trim().isEmpty();
                     %>
@@ -193,10 +201,10 @@
                                          loading="lazy"
                                          crossorigin="anonymous"
                                          onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/resources/images/no-image.png';">
-                                <% } else { %>
+                            <% } else { %>
                                     <div class="no-image">No Image Available</div>
                                 <% } %>
-                            </div>
+                                </div>
                             <div class="product-details">
                                 <h2 class="product-name"><%= product.getName() %></h2>
                                 <p class="product-price">$<%= df.format(product.getPrice()) %></p>
@@ -204,18 +212,18 @@
                                     <p class="product-stock"><%= product.getQuantity() %> in stock</p>
                                 <% } else { %>
                                     <p class="product-stock out-of-stock">Out of stock</p>
-                                <% } %>
+                            <% } %>
                                 <a href="${pageContext.request.contextPath}/products?action=details&id=<%= product.getProductID() %>" class="btn-view">
                                     View Details
                                 </a>
                             </div>
                         </div>
                     <% 
-                        }
-                    } else {
+                            }
+                        } else {
                     %>
                         <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                            <p>No products found.</p>
+                        <p>No products found.</p>
                         </div>
                     <% } %>
                 </div>

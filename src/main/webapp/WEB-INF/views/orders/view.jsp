@@ -143,6 +143,24 @@
             border-radius: 4px;
             margin-bottom: 1rem;
         }
+
+        .alert {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -154,39 +172,83 @@
             <p><strong>Date:</strong> <fmt:formatDate value="${order.orderDate}" pattern="yyyy-MM-dd HH:mm:ss"/></p>
             <p><strong>Status:</strong> ${order.status}</p>
             <p><strong>Total Amount:</strong> $<fmt:formatNumber value="${order.totalAmount}" pattern="#,##0.00"/></p>
+            
+            <c:if test="${not empty sessionScope.message}">
+                <div class="alert alert-success">
+                    ${sessionScope.message}
+                    <c:remove var="message" scope="session" />
+                </div>
+            </c:if>
+            
+            <c:if test="${not empty sessionScope.error}">
+                <div class="alert alert-danger">
+                    ${sessionScope.error}
+                    <c:remove var="error" scope="session" />
+                </div>
+            </c:if>
+
+            <c:if test="${order.status eq 'PENDING' && order.userId eq sessionScope.userId}">
+                <form action="${pageContext.request.contextPath}/orders" method="post" style="margin-top: 1rem;" onsubmit="return confirm('Are you sure you want to cancel this order? This action cannot be undone.');">
+                    <input type="hidden" name="action" value="cancel-order">
+                    <input type="hidden" name="orderId" value="${order.orderId}">
+                    <button type="submit" class="button button-danger">Cancel Order</button>
+                </form>
+            </c:if>
         </div>
         
         <div class="customer-info">
             <h2>Customer Details</h2>
-            <c:if test="${sessionScope.isStaff}">
-                <form action="${pageContext.request.contextPath}/orders" method="post" class="edit-form">
-                    <input type="hidden" name="action" value="update-customer">
-                    <input type="hidden" name="orderId" value="${order.orderId}">
-                    <div class="form-group">
-                        <label><strong>Full Name:</strong></label>
-                        <input type="text" name="firstName" value="${order.userFirstName}" class="form-input" required>
-                        <input type="text" name="lastName" value="${order.userLastName}" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label><strong>Phone:</strong></label>
-                        <input type="text" name="phone" value="${order.userPhone}" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label><strong>Address:</strong></label>
-                        <input type="text" name="address" value="${order.userAddress}" class="form-input" required>
-                    </div>
-                    <button type="submit" class="button">Update Customer Details</button>
-                </form>
-            </c:if>
-            <c:if test="${not sessionScope.isStaff}">
-                <p><strong>Full Name:</strong> ${order.userFirstName} ${order.userLastName}</p>
-                <p><strong>Phone:</strong> ${order.userPhone}</p>
-                <p><strong>Address:</strong> ${order.userAddress}</p>
-            </c:if>
+            <c:choose>
+                <c:when test="${sessionScope.isStaff}">
+                    <form action="${pageContext.request.contextPath}/orders" method="post" class="edit-form">
+                        <input type="hidden" name="action" value="update-customer">
+                        <input type="hidden" name="orderId" value="${order.orderId}">
+                        <div class="form-group">
+                            <label><strong>Full Name:</strong></label>
+                            <input type="text" name="firstName" value="${order.userFirstName}" class="form-input" required>
+                            <input type="text" name="lastName" value="${order.userLastName}" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label><strong>Phone:</strong></label>
+                            <input type="text" name="phone" value="${order.userPhone}" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label><strong>Address:</strong></label>
+                            <input type="text" name="address" value="${order.userAddress}" class="form-input" required>
+                        </div>
+                        <button type="submit" class="button">Update Customer Details</button>
+                    </form>
+                </c:when>
+                <c:when test="${order.status eq 'PENDING' && order.userId eq sessionScope.userId}">
+                    <form action="${pageContext.request.contextPath}/orders" method="post" class="edit-form">
+                        <input type="hidden" name="action" value="update-customer">
+                        <input type="hidden" name="orderId" value="${order.orderId}">
+                        <div class="form-group">
+                            <label><strong>Full Name:</strong></label>
+                            <input type="text" name="firstName" value="${order.userFirstName}" class="form-input" required>
+                            <input type="text" name="lastName" value="${order.userLastName}" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label><strong>Phone:</strong></label>
+                            <input type="text" name="phone" value="${order.userPhone}" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label><strong>Address:</strong></label>
+                            <input type="text" name="address" value="${order.userAddress}" class="form-input" required>
+                        </div>
+                        <button type="submit" class="button">Update My Details</button>
+                    </form>
+                </c:when>
+                <c:otherwise>
+                    <p><strong>Full Name:</strong> ${order.userFirstName} ${order.userLastName}</p>
+                    <p><strong>Phone:</strong> ${order.userPhone}</p>
+                    <p><strong>Address:</strong> ${order.userAddress}</p>
+                </c:otherwise>
+            </c:choose>
         </div>
         
         <h2>Order Items</h2>
-        <c:if test="${sessionScope.isStaff}">
+        <c:if test="${sessionScope.isStaff || (order.status eq 'PENDING' && order.userId eq sessionScope.userId)}">
             <div class="add-item-form">
                 <form action="${pageContext.request.contextPath}/orders" method="post" class="edit-form">
                     <input type="hidden" name="action" value="add-item">
@@ -211,7 +273,7 @@
                     <th>Quantity</th>
                     <th>Price</th>
                     <th>Subtotal</th>
-                    <c:if test="${sessionScope.isStaff}">
+                    <c:if test="${sessionScope.isStaff || (order.status eq 'PENDING' && order.userId eq sessionScope.userId)}">
                         <th>Actions</th>
                     </c:if>
                 </tr>
@@ -219,35 +281,52 @@
             <tbody>
                 <c:forEach var="item" items="${order.orderItems}">
                     <tr>
-                        <c:if test="${sessionScope.isStaff}">
-                            <form action="${pageContext.request.contextPath}/orders" method="post" class="edit-form">
-                                <input type="hidden" name="action" value="update-item">
-                                <input type="hidden" name="orderId" value="${order.orderId}">
-                                <input type="hidden" name="orderItemId" value="${item.orderItemId}">
-                                <td>
-                                    <select name="productId" class="form-input" required>
-                                        <c:forEach var="product" items="${products}">
-                                            <option value="${product.productID}" ${product.productID == item.productId ? 'selected' : ''}>
-                                                ${product.name} ($${product.price})
-                                            </option>
-                                        </c:forEach>
-                                    </select>
-                                </td>
-                                <td><input type="number" name="quantity" value="${item.quantity}" min="1" class="form-input" required></td>
-                                <td><input type="number" name="price" value="${item.price}" min="0" step="0.01" class="form-input" required></td>
+                        <c:choose>
+                            <c:when test="${sessionScope.isStaff}">
+                                <form action="${pageContext.request.contextPath}/orders" method="post" class="edit-form">
+                                    <input type="hidden" name="action" value="update-item">
+                                    <input type="hidden" name="orderId" value="${order.orderId}">
+                                    <input type="hidden" name="orderItemId" value="${item.orderItemId}">
+                                    <td>
+                                        <select name="productId" class="form-input" required>
+                                            <c:forEach var="product" items="${products}">
+                                                <option value="${product.productID}" ${product.productID == item.productId ? 'selected' : ''}>
+                                                    ${product.name} ($${product.price})
+                                                </option>
+                                            </c:forEach>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" name="quantity" value="${item.quantity}" min="1" class="form-input" required></td>
+                                    <td><input type="number" name="price" value="${item.price}" min="0" step="0.01" class="form-input" required></td>
+                                    <td>$<fmt:formatNumber value="${item.price * item.quantity}" pattern="#,##0.00"/></td>
+                                    <td>
+                                        <button type="submit" class="button">Update</button>
+                                        <button type="submit" name="action" value="delete-item" class="button button-danger">Delete</button>
+                                    </td>
+                                </form>
+                            </c:when>
+                            <c:when test="${order.status eq 'PENDING' && order.userId eq sessionScope.userId}">
+                                <form action="${pageContext.request.contextPath}/orders" method="post" class="edit-form">
+                                    <input type="hidden" name="orderItemId" value="${item.orderItemId}">
+                                    <td>${item.productName}</td>
+                                    <td>
+                                        <input type="number" name="quantity" value="${item.quantity}" min="1" class="form-input" required>
+                                        <button type="submit" name="action" value="update-item-quantity" class="button">Update</button>
+                                    </td>
+                                    <td>$<fmt:formatNumber value="${item.price}" pattern="#,##0.00"/></td>
+                                    <td>$<fmt:formatNumber value="${item.price * item.quantity}" pattern="#,##0.00"/></td>
+                                    <td>
+                                        <button type="submit" name="action" value="delete-item" class="button button-danger">Delete</button>
+                                    </td>
+                                </form>
+                            </c:when>
+                            <c:otherwise>
+                                <td>${item.productName}</td>
+                                <td>${item.quantity}</td>
+                                <td>$<fmt:formatNumber value="${item.price}" pattern="#,##0.00"/></td>
                                 <td>$<fmt:formatNumber value="${item.price * item.quantity}" pattern="#,##0.00"/></td>
-                                <td>
-                                    <button type="submit" class="button">Update</button>
-                                    <button type="submit" name="action" value="delete-item" class="button button-danger">Delete</button>
-                                </td>
-                            </form>
-                        </c:if>
-                        <c:if test="${not sessionScope.isStaff}">
-                            <td>${item.productName}</td>
-                            <td>${item.quantity}</td>
-                            <td>$<fmt:formatNumber value="${item.price}" pattern="#,##0.00"/></td>
-                            <td>$<fmt:formatNumber value="${item.price * item.quantity}" pattern="#,##0.00"/></td>
-                        </c:if>
+                            </c:otherwise>
+                        </c:choose>
                     </tr>
                 </c:forEach>
             </tbody>

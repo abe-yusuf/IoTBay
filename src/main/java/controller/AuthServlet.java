@@ -2,6 +2,8 @@ package controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import dao.UserDAO;
 import jakarta.servlet.ServletException;
@@ -10,10 +12,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.User;
+import util.ValidationUtil;
 
 public class AuthServlet extends HttpServlet {
     private UserDAO userDAO;
     private AccessLogServlet accessLogServlet;
+    private static final String STAFF_REGISTRATION_CODE = "GROUP7ISD"; // Staff registration code
 
     @Override
     public void init() throws ServletException {
@@ -50,25 +54,16 @@ public class AuthServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
+        String action = request.getPathInfo();
         
-        if (pathInfo == null || pathInfo.equals("/")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-        
-        switch (pathInfo) {
-            case "/login":
-                handleLogin(request, response);
-                break;
-            case "/register":
-                handleRegister(request, response);
-                break;
-            case "/logout":
-                logout(request, response);
-                break;
-            default:
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        if ("/register".equals(action)) {
+            handleRegistration(request, response);
+        } else if ("/login".equals(action)) {
+            handleLogin(request, response);
+        } else if ("/logout".equals(action)) {
+            handleLogout(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -135,46 +130,98 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    private void handleRegister(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
+    private void handleRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String firstName = request.getParameter("firstName");
+        String lastName = request.getParameter("lastName");
+        String phone = request.getParameter("phone");
+        String address = request.getParameter("address");
+        boolean isStaff = "on".equals(request.getParameter("isStaff"));
+        String staffCode = request.getParameter("staffCode");
+        
+        // Server-side validation
+        List<String> errors = new ArrayList<>();
+        
+        if (!ValidationUtil.isValidEmail(email)) {
+            errors.add("Invalid email address");
+        }
+        
+        if (!ValidationUtil.isValidPassword(password)) {
+            errors.add("Password must be at least 8 characters long and contain uppercase, lowercase, and numbers");
+        }
+        
+        if (!ValidationUtil.isValidName(firstName)) {
+            errors.add("First name must be between 2 and 50 characters");
+        }
+        
+        if (!ValidationUtil.isValidName(lastName)) {
+            errors.add("Last name must be between 2 and 50 characters");
+        }
+        
+        if (phone != null && !phone.isEmpty() && !ValidationUtil.isValidPhone(phone)) {
+            errors.add("Invalid phone number format");
+        }
+        
+        if (address != null && !address.isEmpty() && !ValidationUtil.isValidAddress(address)) {
+            errors.add("Address must be between 5 and 200 characters");
+        }
+        
+        // Validate staff registration code if registering as staff
+        if (isStaff) {
+            if (staffCode == null || staffCode.trim().isEmpty()) {
+                errors.add("Staff registration code is required for staff registration");
+            } else if (!STAFF_REGISTRATION_CODE.equals(staffCode)) {
+                errors.add("Invalid staff registration code");
+            }
+        }
+        
+        if (!errors.isEmpty()) {
+            request.setAttribute("error", String.join(", ", errors));
+            request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
+            return;
+        }
+        
         try {
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            String firstName = request.getParameter("firstName");
-            String lastName = request.getParameter("lastName");
-            String phone = request.getParameter("phone");
-            String address = request.getParameter("address");
-            boolean isStaff = "true".equals(request.getParameter("isStaff"));
+            // Sanitize inputs
+            email = ValidationUtil.sanitizeHtml(email);
+            firstName = ValidationUtil.sanitizeHtml(firstName);
+            lastName = ValidationUtil.sanitizeHtml(lastName);
+            phone = ValidationUtil.sanitizeHtml(phone);
+            address = ValidationUtil.sanitizeHtml(address);
             
-            // Check if email already exists
-            if (userDAO.getUserByEmail(email) != null) {
-                request.setAttribute("error", "Email already exists");
+            // Check if user already exists
+            User existingUser = userDAO.getUserByEmail(email);
+            if (existingUser != null) {
+                request.setAttribute("error", "Email already registered");
                 request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
                 return;
             }
             
-            // If registering as staff, verify admin credentials
-            if (isStaff) {
-                String adminEmail = request.getParameter("adminEmail");
-                String adminPassword = request.getParameter("adminPassword");
-                
-                if (adminEmail == null || adminPassword == null || 
-                    !adminEmail.equals("admin@iotbay.com") || !adminPassword.equals("admin")) {
-                    request.setAttribute("error", "Invalid admin credentials");
-                    request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
-                    return;
-                }
-            }
-
             // Create new user
-            User user = new User(0, email, password, firstName, lastName, phone, address, isStaff, true);
-            user = userDAO.createUser(user);
-
-            // Set success message
-            request.setAttribute("message", "Registration successful! Please login.");
-            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
+            User user = new User();
+            user.setEmail(email);
+            user.setPassword(password); // In production, hash the password
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setPhone(phone);
+            user.setAddress(address);
+            user.setStaff(isStaff);
+            user.setActive(true);
+            
+            userDAO.createUser(user);
+            
+            // Log the successful registration
+            System.out.println("New user registered: " + email + (isStaff ? " (Staff)" : " (Customer)"));
+            
+            // Redirect to login page with success message
+            String registrationType = isStaff ? "staff" : "customer";
+            response.sendRedirect(request.getContextPath() + "/auth/login?registered=true&type=" + registrationType);
+            
         } catch (SQLException e) {
-            throw new ServletException("Error registering user", e);
+            e.printStackTrace();
+            request.setAttribute("error", "Registration failed. Please try again.");
+            request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
         }
     }
 
@@ -195,5 +242,23 @@ public class AuthServlet extends HttpServlet {
         }
         
         response.sendRedirect(request.getContextPath() + "/auth/login");
+    }
+
+    private void handleLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            // Log logout time
+            accessLogServlet.logLogout(request);
+            
+            // Invalidate session
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            response.sendRedirect(request.getContextPath() + "/auth/login?logout=true");
+        } catch (ServletException e) {
+            // Log the error but don't prevent logout
+            System.err.println("Warning: Failed to log logout: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/auth/login?logout=true");
+        }
     }
 } 

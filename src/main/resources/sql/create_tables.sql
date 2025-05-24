@@ -31,24 +31,25 @@ CREATE TABLE PRODUCTS (
     PRICE DOUBLE NOT NULL,
     QUANTITY INTEGER NOT NULL,
     FAVOURITED BOOLEAN DEFAULT FALSE,
+    PRODUCT_TYPE VARCHAR(50) NOT NULL,
     PRIMARY KEY (PRODUCT_ID)
 );
 
 -- Sample product data
-INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED) 
-VALUES ('Smart Thermostat', 'https://m.media-amazon.com/images/I/5118X+rWiOL.jpg', 'Control your home temperature remotely with this smart thermostat.', 129.99, 50, FALSE);
+INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED, PRODUCT_TYPE) 
+VALUES ('Smart Thermostat', 'https://m.media-amazon.com/images/I/5118X+rWiOL.jpg', 'Control your home temperature remotely with this smart thermostat.', 129.99, 50, FALSE, 'Climate Control');
 
-INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED) 
-VALUES ('Security Camera', 'https://thespystore.com.au/cdn/shop/products/1_91e20459-f870-4d6f-b9a9-afe34a9497ba.jpg', 'HD security camera with motion detection and night vision.', 89.99, 30, FALSE);
+INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED, PRODUCT_TYPE) 
+VALUES ('Security Camera', 'https://thespystore.com.au/cdn/shop/products/1_91e20459-f870-4d6f-b9a9-afe34a9497ba.jpg', 'HD security camera with motion detection and night vision.', 89.99, 30, FALSE, 'Security');
 
-INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED) 
-VALUES ('Smart Light Bulb', 'https://cdn11.bigcommerce.com/s-apgyqyq0gk/images/stencil/500x500/products/3434/4856/laser-10w-smart-white-bulb-b22-2295__40336.1725334359.jpg?c=1', 'Color-changing smart light bulb that can be controlled via app.', 29.99, 100, FALSE);
+INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED, PRODUCT_TYPE) 
+VALUES ('Smart Light Bulb', 'https://cdn11.bigcommerce.com/s-apgyqyq0gk/images/stencil/500x500/products/3434/4856/laser-10w-smart-white-bulb-b22-2295__40336.1725334359.jpg?c=1', 'Color-changing smart light bulb that can be controlled via app.', 29.99, 100, FALSE, 'Lighting');
 
-INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED) 
-VALUES ('Smart Speaker', 'https://i5.walmartimages.com/asr/92a6e18c-c8e9-471f-bc92-f40cfa38f40b.5c900739f23c354c54e29fb7eb89b0ac.jpeg', 'Voice-controlled smart speaker with virtual assistant.', 79.99, 45, FALSE);
+INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED, PRODUCT_TYPE) 
+VALUES ('Smart Speaker', 'https://i5.walmartimages.com/asr/92a6e18c-c8e9-471f-bc92-f40cfa38f40b.5c900739f23c354c54e29fb7eb89b0ac.jpeg', 'Voice-controlled smart speaker with virtual assistant.', 79.99, 45, FALSE, 'Entertainment');
 
-INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED) 
-VALUES ('Door Lock', 'https://www.jbhifi.com.au/cdn/shop/products/608109-Product-0-I-638004961640652731.jpg', 'Smart door lock with fingerprint and PIN access.', 149.99, 20, FALSE);
+INSERT INTO PRODUCTS (NAME, IMAGE_URL, DESCRIPTION, PRICE, QUANTITY, FAVOURITED, PRODUCT_TYPE) 
+VALUES ('Door Lock', 'https://www.jbhifi.com.au/cdn/shop/products/608109-Product-0-I-638004961640652731.jpg', 'Smart door lock with fingerprint and PIN access.', 149.99, 20, FALSE, 'Security');
 
 -- Orders table
 CREATE TABLE orders (
