@@ -12,8 +12,7 @@ IoTBay is a comprehensive e-commerce platform specialized in IoT (Internet of Th
 
 1. Clone the repository:
 ```bash
-git clone [your-repository-url]
-cd iotbay
+git clone [repository-url]
 ```
 
 2. Build the project:
