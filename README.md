@@ -18,7 +18,7 @@ cd iotbay
 
 2. Build the project:
 ```bash
-mvn clean install
+mvn clean package
 ```
 
 3. Deploy the WAR file:
@@ -30,7 +30,7 @@ mvn clean install
 - Default admin credentials: 
   - Email: admin@iotbay.com
   - Password: admin
-
+- Default staff register password: "GROUP7ISD"
 ## Database Setup
 The application uses Apache Derby as its database. The database will be automatically:
 - Created in `~/.derby/iotbay` directory (user's home directory)
